@@ -13,22 +13,24 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase only if config is provided
-let app;
-let auth;
-let db;
-let storage;
+let app = null;
+let auth = null;
+let db = null;
+let storage = null;
+
+const isConfigValid = !!(firebaseConfig.apiKey && firebaseConfig.projectId && firebaseConfig.appId);
 
 try {
-  if (firebaseConfig.apiKey) {
+  if (isConfigValid) {
     app = initializeApp(firebaseConfig);
     auth = getAuth(app);
     db = getFirestore(app);
     storage = getStorage(app);
   } else {
-    console.warn("Firebase configuration is missing. Using mock data mode.");
+    console.warn("Firebase configuration is missing. Real-time features will be disabled. Please set VITE_FIREBASE_* environment variables in Vercel.");
   }
 } catch (error) {
   console.error("Error initializing Firebase:", error);
 }
 
-export { auth, db, storage };
+export { auth, db, storage, isConfigValid };

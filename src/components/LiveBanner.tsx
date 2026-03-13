@@ -31,19 +31,19 @@ export default function LiveBanner() {
         initial={{ height: 0, opacity: 0 }}
         animate={{ height: "auto", opacity: 1 }}
         exit={{ height: 0, opacity: 0 }}
-        className="bg-red-600 text-white overflow-hidden relative"
+        className="bg-red-50 dark:bg-red-600 text-red-700 dark:text-white overflow-hidden relative border-b border-red-100 dark:border-red-500"
       >
         <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 overflow-hidden">
             <div className="relative flex h-3 w-3 shrink-0">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-white"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 dark:bg-white opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-red-600 dark:bg-white"></span>
             </div>
             <span className="font-bold whitespace-nowrap text-sm md:text-base">
               {status.title || "Sangsad Live Now 🔴"}
             </span>
-            <div className="hidden md:block h-4 w-px bg-white/30"></div>
-            <p className="hidden md:block text-sm text-red-100 truncate">
+            <div className="hidden md:block h-4 w-px bg-red-200 dark:bg-white/30"></div>
+            <p className="hidden md:block text-sm text-red-600 dark:text-red-100 truncate">
               জাতীয় সংসদের অধিবেশন সরাসরি সম্প্রচারিত হচ্ছে
             </p>
           </div>
@@ -53,14 +53,14 @@ export default function LiveBanner() {
               href={status.liveUrl} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="flex items-center gap-2 bg-white text-red-600 px-3 py-1 rounded-full text-xs md:text-sm font-bold hover:bg-red-50 transition-colors whitespace-nowrap"
+              className="flex items-center gap-2 bg-red-600 dark:bg-white text-white dark:text-red-600 px-3 py-1 rounded-full text-xs md:text-sm font-bold hover:bg-red-700 dark:hover:bg-red-50 transition-colors whitespace-nowrap shadow-sm"
             >
               সরাসরি দেখুন
               <ExternalLink size={14} />
             </a>
             <button 
               onClick={() => setVisible(false)}
-              className="p-1 hover:bg-white/10 rounded-full transition-colors"
+              className="p-1 hover:bg-red-100 dark:hover:bg-white/10 rounded-full transition-colors text-red-400 dark:text-white"
             >
               <X size={18} />
             </button>

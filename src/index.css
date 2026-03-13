@@ -1,17 +1,24 @@
-@import url('https://fonts.maateen.me/ador-noirrit/font.css');
-@import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap');
 @import url('https://fonts.maateen.me/solaiman-lipi/font.css');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark, .dark *));
 
 @theme {
-  --font-sans: "Solaiman Lipi", "Hind Siliguri", "Ador Noirrit", "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Solaiman Lipi", "Hind Siliguri", "Ador Noirrit", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-sans: "SolaimanLipi", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "SolaimanLipi", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
 }
 
 @layer base {
+  html {
+    font-size: 14px;
+  }
+  @media (min-width: 768px) {
+    html {
+      font-size: 16px;
+    }
+  }
   body {
     @apply font-sans antialiased bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100;
   }

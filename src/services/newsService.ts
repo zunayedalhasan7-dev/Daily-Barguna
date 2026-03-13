@@ -2,33 +2,6 @@ import { db } from "../firebase";
 import { collection, getDocs, doc, getDoc, query, where, orderBy, limit, addDoc, updateDoc, deleteDoc, serverTimestamp, setDoc, Timestamp, onSnapshot, deleteField } from "firebase/firestore";
 import { GoogleGenAI } from "@google/genai";
 
-// Helper to handle localStorage persistence for mock data
-const STORAGE_KEYS = {
-  NEWS: "daily_barguna_news",
-  TICKERS: "daily_barguna_tickers",
-  ADS: "daily_barguna_ads",
-  SOCIAL: "daily_barguna_social",
-  RAMADAN: "daily_barguna_ramadan",
-  PAGES: "daily_barguna_pages"
-};
-
-const loadFromStorage = <T>(key: string, defaultValue: T): T => {
-  try {
-    const stored = localStorage.getItem(key);
-    return stored ? JSON.parse(stored) : defaultValue;
-  } catch (e) {
-    return defaultValue;
-  }
-};
-
-const saveToStorage = (key: string, data: any) => {
-  try {
-    localStorage.setItem(key, JSON.stringify(data));
-  } catch (e) {
-    console.error("Error saving to localStorage", e);
-  }
-};
-
 export interface NewsArticle {
   id: string;
   title: string;
@@ -170,104 +143,27 @@ export const sortNewsByTrendingAndDate = (a: NewsArticle, b: NewsArticle) => {
   return b.publishDate - a.publishDate;
 };
 
-// Mock Data strictly for Barguna District
-let mockNews: NewsArticle[] = loadFromStorage(STORAGE_KEYS.NEWS, [
-  {
-    id: "1",
-    title: "বরগুনা সদরে নতুন আধুনিক হাসপাতালের ভিত্তিপ্রস্তর স্থাপন",
-    description: "বরগুনা সদর উপজেলার মানুষের দীর্ঘদিনের দাবি পূরণে নতুন একটি আধুনিক হাসপাতালের ভিত্তিপ্রস্তর স্থাপন করা হয়েছে।",
-    content: "<p>বরগুনা সদর উপজেলার মানুষের দীর্ঘদিনের দাবি পূরণে নতুন একটি আধুনিক হাসপাতালের ভিত্তিপ্রস্তর স্থাপন করা হয়েছে। স্বাস্থ্যমন্ত্রী আজ সকালে এই ভিত্তিপ্রস্তর স্থাপন করেন। এর ফলে জেলার চিকিৎসা ব্যবস্থায় আমূল পরিবর্তন আসবে বলে আশা করা হচ্ছে।</p><p>স্থানীয় জনপ্রতিনিধিরা জানান, এই হাসপাতালটি চালু হলে সাধারণ মানুষকে আর চিকিৎসার জন্য বরিশাল বা ঢাকায় যেতে হবে পরিচয়।</p>",
-    imageUrl: "https://picsum.photos/seed/hospital-barguna/800/500",
-    category: "বরগুনা সদর",
-    author: "Admin",
-    publishDate: Date.now() - 100000,
-    views: 1250,
-    trending: true,
-    keywords: ["হাসপাতাল", "ভিত্তিপ্রস্তর", "বরগুনা সদর", "চিকিৎসা", "স্বাস্থ্য"],
-  },
-  {
-    id: "2",
-    title: "পাথরঘাটায় ইলিশের বাম্পার ফলন, জেলেদের মুখে হাসি",
-    description: "বঙ্গোপসাগরে মাছ ধরার নিষেধাজ্ঞা শেষে পাথরঘাটার বিএফডিসি মৎস্য অবতরণ কেন্দ্রে প্রচুর ইলিশ ধরা পড়ছে।",
-    content: "<p>বঙ্গোপসাগরে মাছ ধরার নিষেধাজ্ঞা শেষে পাথরঘাটার বিএফডিসি মৎস্য অবতরণ কেন্দ্রে প্রচুর ইলিশ ধরা পড়ছে। প্রতিদিন শত শত ট্রলার মাছ নিয়ে ঘাটে ফিরছে।</p><p>মৎস্য ব্যবসায়ীরা জানান, গত কয়েক বছরের তুলনায় এবার ইলিশের আকার বেশ বড় এবং দামও ভালো পাওয়া যাচ্ছে। এতে জেলেদের মুখে হাসি ফুটেছে।</p>",
-    imageUrl: "https://picsum.photos/seed/hilsa-patharghata/800/500",
-    category: "পাথরঘাটা",
-    author: "মৎস্য প্রতিবেদক",
-    publishDate: Date.now() - 500000,
-    views: 3400,
-    trending: true,
-    keywords: ["ইলিশ", "পাথরঘাটা", "জেলে", "মৎস্য", "বঙ্গোপসাগর"],
-  },
-  {
-    id: "3",
-    title: "আমতলীতে কৃষকদের মাঝে বিনামূল্যে সার ও বীজ বিতরণ",
-    description: "আমতলী উপজেলা কৃষি সম্প্রসারণ অধিদপ্তরের উদ্যোগে প্রান্তিক কৃষকদের মাঝে বিনামূল্যে সার ও বীজ বিতরণ করা হয়েছে।",
-    content: "<p>আমতলী উপজেলা কৃষি সম্প্রসারণ অধিদপ্তরের উদ্যোগে প্রান্তিক কৃষকদের মাঝে বিনামূল্যে সার ও বীজ বিতরণ করা হয়েছে। রবি মৌসুমের ফসল উৎপাদন বৃদ্ধির লক্ষ্যে এই উদ্যোগ নেওয়া হয়েছে।</p><p>উপজেলা কৃষি কর্মকর্তা জানান, এই প্রণোদনার ফলে কৃষকরা আর্থিকভাবে লাভবান হবেন এবং উৎপাদন বৃদ্ধি পাবে।</p>",
-    imageUrl: "https://picsum.photos/seed/agriculture-amtali/800/500",
-    category: "আমতলী",
-    author: "কৃষি প্রতিবেদক",
-    publishDate: Date.now() - 800000,
-    views: 890,
-    trending: false,
-    keywords: ["কৃষক", "আমতলী", "সার", "বীজ", "কৃষি"],
-  },
-  {
-    id: "4",
-    title: "বেতাগীতে বিষখালী নদীর ভাঙন রোধে মানববন্ধন",
-    description: "বেতাগী উপজেলায় বিষখালী নদীর তীব্র ভাঙন রোধে দ্রুত ব্যবস্থা নেওয়ার দাবিতে মানববন্ধন করেছে এলাকাবাসী।",
-    content: "<p>বেতাগী উপজেলায় বিষখালী নদীর তীব্র ভাঙন রোধে দ্রুত ব্যবস্থা নেওয়ার দাবিতে মানববন্ধন করেছে এলাকাবাসী। গত কয়েক সপ্তাহে নদীর ভাঙনে বেশ কয়েকটি বাড়িঘর ও ফসলি জমি বিলীন হয়ে গেছে।</p><p>পানি উন্নয়ন বোর্ডের কর্মকর্তারা জানিয়েছেন, ভাঙন রোধে দ্রুত জিও ব্যাগ ফেলার কাজ শুরু হবে।</p>",
-    imageUrl: "https://picsum.photos/seed/river-betagi/800/500",
-    category: "বেতাগী",
-    author: "উপজেলা প্রতিনিধি",
-    publishDate: Date.now() - 1200000,
-    views: 2100,
-    trending: true,
-    keywords: ["বিষখালী", "নদী ভাঙন", "বেতাগী", "মানববন্ধন"],
-  },
-  {
-    id: "5",
-    title: "তালতলীতে রাখাইন সম্প্রদায়ের জলকেলি উৎসব পালিত",
-    description: "বরগুনার তালতলী উপজেলায় রাখাইন সম্প্রদায়ের ঐতিহ্যবাহী জলকেলি বা সাংগ্রাই উৎসব আনন্দমুখর পরিবেশে পালিত হয়েছে।",
-    content: "<p>বরগুনার তালতলী উপজেলায় রাখাইন সম্প্রদায়ের ঐতিহ্যবাহী জলকেলি বা সাংগ্রাই উৎসব আনন্দমুখর পরিবেশে পালিত হয়েছে। নতুন বছরকে বরণ করে নিতে তারা একে অপরের গায়ে পানি ছিটিয়ে এই উৎসব পালন করে।</p><p>স্থানীয় প্রশাসন উৎসব সুষ্ঠুভাবে সম্পন্ন করতে প্রয়োজনীয় নিরাপত্তা ব্যবস্থা গ্রহণ করেছিল।</p>",
-    imageUrl: "https://picsum.photos/seed/rakhine-taltali/800/500",
-    category: "তালতলী",
-    author: "সংস্কৃতি প্রতিবেদক",
-    publishDate: Date.now() - 2000000,
-    views: 1450,
-    trending: false,
-    keywords: ["রাখাইন", "জলকেলি", "তালতলী", "উৎসব", "সাংগ্রাই"],
-  }
-]);
-
-let mockTickers: Ticker[] = loadFromStorage(STORAGE_KEYS.TICKERS, [
-  { id: "t1", text: "বরগুনায় নতুন আধুনিক হাসপাতালের ভিত্তিপ্রস্তর স্থাপন করেছেন স্বাস্থ্যমন্ত্রী।", isActive: true, createdAt: Date.now() },
-  { id: "t2", text: "পাথরঘাটায় ইলিশের বাম্পার ফলন, জেলেদের মুখে হাসি।", isActive: true, createdAt: Date.now() - 1000 },
-  { id: "t3", text: "বিজ্ঞাপন দিন দৈনিক বরগুনায় - যোগাযোগ করুন: info@dailybarguna.com", isActive: true, createdAt: Date.now() - 2000 }
-]);
-
-let mockAds: Ad[] = loadFromStorage(STORAGE_KEYS.ADS, [
-  { id: "a1", imageUrl: "https://picsum.photos/seed/ad1/1200/150", linkUrl: "#", isActive: true, createdAt: Date.now() }
-]);
-
-let mockSocialLinks: SocialLinks = loadFromStorage(STORAGE_KEYS.SOCIAL, {
-  facebook: "https://facebook.com",
-  twitter: "https://twitter.com",
-  youtube: "https://youtube.com",
-  instagram: "https://instagram.com"
-});
-
-let mockRamadanTimer: RamadanTimer = loadFromStorage(STORAGE_KEYS.RAMADAN, {
-  sehriTime: "04:45 AM",
-  iftarTime: "06:15 PM",
+// Initial empty states
+let mockNews: NewsArticle[] = [];
+let mockTickers: Ticker[] = [];
+let mockAds: Ad[] = [];
+let mockSocialLinks: SocialLinks = {
+  facebook: "",
+  twitter: "",
+  youtube: "",
+  instagram: ""
+};
+let mockRamadanTimer: RamadanTimer = {
+  sehriTime: "",
+  iftarTime: "",
   isActive: false
-});
-
-let mockPageSettings: PageSettings = loadFromStorage(STORAGE_KEYS.PAGES, {
-  about: "দৈনিক বরগুনা সম্পর্কে বিস্তারিত তথ্য এখানে থাকবে।",
-  privacy: "আমাদের গোপনীয়তা নীতি এখানে থাকবে।",
-  terms: "ব্যবহারের শর্তাবলী এখানে থাকবে।",
-  contact: "আমাদের সাথে যোগাযোগের ঠিকানা ও তথ্য এখানে থাকবে।"
-});
+};
+let mockPageSettings: PageSettings = {
+  about: "",
+  privacy: "",
+  terms: "",
+  contact: ""
+};
 
 export interface SearchFilters {
   query?: string;
@@ -492,7 +388,6 @@ export const newsService = {
     const newId = Math.random().toString(36).substring(7);
     const newArticle = { ...newsData, id: newId, views: 0, publishDate: Date.now(), author: newsData.author || "Admin" };
     mockNews.push(newArticle as NewsArticle);
-    saveToStorage(STORAGE_KEYS.NEWS, mockNews);
     console.log("News added to mock storage:", newArticle);
     return newId;
   },
@@ -523,7 +418,6 @@ export const newsService = {
       if (news.videoUrl === "") delete updatedMock.videoUrl;
       if (news.union === "") delete updatedMock.union;
       mockNews[index] = updatedMock as NewsArticle;
-      saveToStorage(STORAGE_KEYS.NEWS, mockNews);
     }
   },
 
@@ -538,7 +432,6 @@ export const newsService = {
       }
     }
     mockNews = mockNews.filter(n => n.id !== id);
-    saveToStorage(STORAGE_KEYS.NEWS, mockNews);
   },
 
   // Ticker Methods
@@ -586,7 +479,6 @@ export const newsService = {
     }
     const newId = Math.random().toString(36).substring(7);
     mockTickers.push({ id: newId, text, isActive: true, createdAt: Date.now() });
-    saveToStorage(STORAGE_KEYS.TICKERS, mockTickers);
     return newId;
   },
 
@@ -603,7 +495,6 @@ export const newsService = {
     const index = mockTickers.findIndex(t => t.id === id);
     if (index !== -1) {
       mockTickers[index] = { ...mockTickers[index], ...updates };
-      saveToStorage(STORAGE_KEYS.TICKERS, mockTickers);
     }
   },
 
@@ -618,7 +509,6 @@ export const newsService = {
       }
     }
     mockTickers = mockTickers.filter(t => t.id !== id);
-    saveToStorage(STORAGE_KEYS.TICKERS, mockTickers);
   },
 
   // Ad Methods
@@ -665,7 +555,6 @@ export const newsService = {
     }
     const newId = Math.random().toString(36).substring(7);
     mockAds.push({ ...ad, id: newId, createdAt: Date.now() });
-    saveToStorage(STORAGE_KEYS.ADS, mockAds);
     return newId;
   },
 
@@ -682,7 +571,6 @@ export const newsService = {
     const index = mockAds.findIndex(a => a.id === id);
     if (index !== -1) {
       mockAds[index] = { ...mockAds[index], ...updates };
-      saveToStorage(STORAGE_KEYS.ADS, mockAds);
     }
   },
 
@@ -697,7 +585,6 @@ export const newsService = {
       }
     }
     mockAds = mockAds.filter(a => a.id !== id);
-    saveToStorage(STORAGE_KEYS.ADS, mockAds);
   },
 
   // Social Links Methods
@@ -718,7 +605,6 @@ export const newsService = {
 
   async updateSocialLinks(links: SocialLinks): Promise<void> {
     mockSocialLinks = { ...links };
-    saveToStorage(STORAGE_KEYS.SOCIAL, mockSocialLinks);
 
     if (db) {
       try {
@@ -753,7 +639,6 @@ export const newsService = {
   async updateRamadanTimer(timer: RamadanTimer): Promise<void> {
     // Always update local state first for immediate UI response
     mockRamadanTimer = { ...timer };
-    saveToStorage(STORAGE_KEYS.RAMADAN, mockRamadanTimer);
 
     if (db) {
       try {
@@ -762,7 +647,7 @@ export const newsService = {
       } catch (error: any) {
         console.error("Firestore updateRamadanTimer error:", error);
         if (error.code === 'permission-denied') {
-          throw new Error("ফায়ারবেস ডাটাবেসে সেভ করার অনুমতি নেই। অনুগ্রহ করে সিকিউরিটি রুলস চেক করুন। তবে আপনার ব্রাউজারে এটি সাময়িকভাবে সেভ হয়েছে।");
+          throw new Error("ফায়ারবেস ডাটাবেসে সেভ করার অনুমতি নেই। অনুগ্রহ করে সিকিউরিটি রুলস চেক করুন।");
         }
         throw error;
       }
@@ -787,7 +672,6 @@ export const newsService = {
 
   async updatePageSettings(settings: PageSettings): Promise<void> {
     mockPageSettings = { ...settings };
-    saveToStorage(STORAGE_KEYS.PAGES, mockPageSettings);
 
     if (db) {
       try {
@@ -824,7 +708,12 @@ export const newsService = {
         liveUrl: result.liveUrl || "https://www.youtube.com/@BangladeshParliament/live",
         title: result.title || "জাতীয় সংসদ সরাসরি সম্প্রচারিত হচ্ছে"
       };
-    } catch (error) {
+    } catch (error: any) {
+      const errorString = String(error);
+      if (errorString.includes("429") || errorString.includes("RESOURCE_EXHAUSTED") || errorString.includes("quota")) {
+        // Silently fail on quota exhaustion to prevent console spam
+        return { isLive: false };
+      }
       console.error("Error checking parliament live status:", error);
       return { isLive: false };
     }

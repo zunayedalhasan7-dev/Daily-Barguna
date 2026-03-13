@@ -67,76 +67,94 @@ export default function Layout() {
       hour12: true 
     });
     
-    const banglaDate = new Intl.DateTimeFormat('bn-BD-u-ca-bengali', {
+    // Gregorian Date in Bangla
+    const gregorianDate = new Intl.DateTimeFormat('bn-BD', {
       day: 'numeric',
       month: 'long',
       year: 'numeric',
       weekday: 'long'
     }).format(date);
     
+    // Hijri Date
     const hijriDate = new Intl.DateTimeFormat('bn-BD-u-ca-islamic', {
       day: 'numeric',
       month: 'long',
       year: 'numeric'
     }).format(date);
     
-    return { time, banglaDate, hijriDate };
+    return { time, gregorianDate, hijriDate };
   };
 
-  const { time, banglaDate, hijriDate } = formatDateTime(currentTime);
+  const { time, gregorianDate, hijriDate } = formatDateTime(currentTime);
 
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300 font-sans">
       
+      {/* Top Bar (Somoy TV Style) */}
+      <div className="bg-gray-100 dark:bg-[#1a1a1a] text-gray-600 dark:text-gray-300 py-1 text-[10px] sm:text-xs border-b border-gray-200 dark:border-gray-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-8 sm:h-10">
+          <div className="flex items-center gap-2 sm:gap-4 overflow-hidden">
+            <div className="flex items-center gap-2 font-medium">
+              <span className="whitespace-nowrap hidden xs:inline">{gregorianDate}</span>
+              <span className="text-gray-600 hidden xs:inline">|</span>
+              <span className="whitespace-nowrap">{hijriDate}</span>
+              <span className="text-gray-600 hidden sm:inline">|</span>
+              <span className="whitespace-nowrap font-bold text-gray-900 dark:text-gray-300">{time}</span>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-3 sm:gap-6">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <a 
+                href="#" 
+                onClick={handleAdminClick} 
+                className="text-[9px] sm:text-[11px] font-bold hover:text-red-700 dark:hover:text-white transition-colors border border-gray-300 dark:border-gray-700 px-2 py-0.5 rounded-sm"
+              >
+                Employee
+              </a>
+              <div className="hidden md:flex items-center gap-4 border-l border-gray-300 dark:border-gray-700 pl-4">
+                <a href={socialLinks.facebook} target="_blank" rel="noopener noreferrer" className="hover:text-red-700 dark:hover:text-white transition-colors"><Facebook size={14} /></a>
+                <a href={socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="hover:text-red-700 dark:hover:text-white transition-colors">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                  </svg>
+                </a>
+                <a href={socialLinks.youtube} target="_blank" rel="noopener noreferrer" className="hover:text-red-700 dark:hover:text-white transition-colors"><Youtube size={14} /></a>
+                <button 
+                  onClick={toggleTheme}
+                  className="p-1 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-full transition-colors"
+                  aria-label="Toggle Theme"
+                >
+                  {theme === "dark" ? <Sun size={14} /> : <Moon size={14} />}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Ramadan Timer */}
       <RamadanTimer />
 
       {/* Live Banner */}
       <LiveBanner />
 
-      {/* Top Bar */}
-      <div className="bg-gray-900 text-gray-300 py-1.5 text-xs border-b border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          <div className="flex flex-wrap items-center gap-2 font-medium font-solaiman-lipi">
-            <span className="w-40 text-left">{banglaDate}</span>
-            <span className="hidden sm:inline-block">|</span>
-            <span className="w-32 text-left">{hijriDate}</span>
-            <span className="hidden sm:inline-block">|</span>
-            <span className="font-mono w-24 text-center">{time}</span>
-            <span className="hidden sm:inline-block">|</span>
-            <span className="hidden sm:inline-block">বরগুনা, বাংলাদেশ</span>
-          </div>
-          <div className="flex items-center space-x-4">
-            <a href="#" onClick={handleAdminClick} className="hover:text-white transition-colors">Employee</a>
-            <div className="flex items-center space-x-3 border-l border-gray-700 pl-4">
-              <a href={socialLinks.facebook} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors"><Facebook size={14} /></a>
-              <a href={socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                </svg>
-              </a>
-              <a href={socialLinks.youtube} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors"><Youtube size={14} /></a>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Header */}
       <header className="bg-white dark:bg-gray-900 sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20">
+          <div className="flex justify-between items-center h-16 sm:h-20">
             
             {/* Logo */}
             <div className="flex-shrink-0 flex items-center">
-              <Link to="/" className="flex items-center gap-2 group">
-                <div className="bg-red-700 text-white p-2 rounded-sm flex-shrink-0">
-                  <span className="font-serif font-black text-2xl leading-none">দ</span>
+              <Link to="/" className="flex items-center gap-1.5 sm:gap-2 group">
+                <div className="bg-red-700 text-white p-1.5 sm:p-2 rounded-sm flex-shrink-0">
+                  <span className="font-serif font-black text-xl sm:text-2xl leading-none">দ</span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="font-serif font-black text-3xl tracking-tight text-gray-900 dark:text-white leading-none">
+                  <span className="font-serif font-black text-xl sm:text-3xl tracking-tight text-gray-900 dark:text-white leading-none">
                     দৈনিক <span className="text-red-700">বরগুনা</span>
                   </span>
-                  <span className="text-[10px] uppercase tracking-[0.2em] text-gray-500 dark:text-gray-400 font-bold mt-1">
+                  <span className="text-[8px] sm:text-[10px] uppercase tracking-[0.1em] sm:tracking-[0.2em] text-gray-500 dark:text-gray-400 font-bold mt-0.5 sm:mt-1">
                     সত্যের সন্ধানে অবিরাম
                   </span>
                 </div>
@@ -284,7 +302,7 @@ export default function Layout() {
       )}
 
       {/* Main Content */}
-      <main className="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+      <main className="flex-grow max-w-7xl mx-auto w-full px-3 sm:px-6 lg:px-8 py-4 md:py-12">
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}
@@ -299,7 +317,7 @@ export default function Layout() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white pt-16 pb-8 border-t-4 border-red-700">
+      <footer className="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white pt-16 pb-8 border-t-4 border-red-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
             
@@ -309,32 +327,32 @@ export default function Layout() {
                   <span className="font-serif font-black text-2xl leading-none">দ</span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="font-serif font-black text-3xl tracking-tight text-white leading-none">
-                    দৈনিক <span className="text-red-500">বরগুনা</span>
+                  <span className="font-serif font-black text-3xl tracking-tight text-gray-900 dark:text-white leading-none">
+                    দৈনিক <span className="text-red-700 dark:text-red-500">বরগুনা</span>
                   </span>
                 </div>
               </Link>
-              <p className="text-gray-400 text-sm leading-relaxed max-w-md font-serif">
+              <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed max-w-md font-serif">
                 বরগুনা জেলার সর্বশেষ সংবাদ, রাজনীতি, অর্থনীতি, বিনোদন, খেলাধুলা এবং লাইফস্টাইলের নির্ভরযোগ্য উৎস। সত্যের সন্ধানে আমরা সর্বদা অবিচল।
               </p>
               <div className="flex space-x-4">
-                <a href={socialLinks.facebook} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-red-700 transition-colors"><Facebook size={18} /></a>
-                <a href={socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-red-700 transition-colors">
+                <a href={socialLinks.facebook} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center hover:bg-red-700 transition-colors text-gray-600 dark:text-white"><Facebook size={18} /></a>
+                <a href={socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center hover:bg-red-700 transition-colors text-gray-600 dark:text-white">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                   </svg>
                 </a>
-                <a href={socialLinks.youtube} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-red-700 transition-colors"><Youtube size={18} /></a>
-                <a href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-red-700 transition-colors"><Instagram size={18} /></a>
+                <a href={socialLinks.youtube} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center hover:bg-red-700 transition-colors text-gray-600 dark:text-white"><Youtube size={18} /></a>
+                <a href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center hover:bg-red-700 transition-colors text-gray-600 dark:text-white"><Instagram size={18} /></a>
               </div>
             </div>
 
             <div>
-              <h3 className="text-lg font-bold font-serif mb-6 border-b border-gray-800 pb-2">উপজেলা সমূহ</h3>
+              <h3 className="text-lg font-bold font-serif mb-6 border-b border-gray-200 dark:border-gray-800 pb-2">উপজেলা সমূহ</h3>
               <ul className="space-y-3">
                 {CATEGORIES.filter(c => c !== "সারাদেশ").slice(0, 6).map(cat => (
                   <li key={cat}>
-                    <Link to={`/category/${cat}`} className="text-gray-400 hover:text-white transition-colors text-sm flex items-center">
+                    <Link to={`/category/${cat}`} className="text-gray-600 dark:text-gray-400 hover:text-red-700 dark:hover:text-white transition-colors text-sm flex items-center">
                       <ChevronRight size={14} className="mr-2 text-red-500" /> {cat}
                     </Link>
                   </li>
@@ -343,31 +361,31 @@ export default function Layout() {
             </div>
 
             <div>
-              <h3 className="text-lg font-bold font-serif mb-6 border-b border-gray-800 pb-2">যোগাযোগ</h3>
-              <ul className="space-y-4 text-sm text-gray-400">
+              <h3 className="text-lg font-bold font-serif mb-6 border-b border-gray-200 dark:border-gray-800 pb-2">যোগাযোগ</h3>
+              <ul className="space-y-4 text-sm text-gray-600 dark:text-gray-400">
                 <li>
-                  <strong className="block text-white mb-1">সম্পাদক ও প্রকাশক:</strong>
+                  <strong className="block text-gray-900 dark:text-white mb-1">সম্পাদক ও প্রকাশক:</strong>
                   মোঃ জুনায়েদ আল হাসান
                 </li>
                 <li>
-                  <strong className="block text-white mb-1">কার্যালয়:</strong>
+                  <strong className="block text-gray-900 dark:text-white mb-1">কার্যালয়:</strong>
                   সদর রোড, বরগুনা - ৮৭০০, বাংলাদেশ
                 </li>
                 <li>
-                  <strong className="block text-white mb-1">ইমেইল:</strong>
-                  <a href="mailto:dailybarguna01@gmail.com" className="hover:text-red-400 transition-colors">dailybarguna01@gmail.com</a>
+                  <strong className="block text-gray-900 dark:text-white mb-1">ইমেইল:</strong>
+                  <a href="mailto:dailybarguna01@gmail.com" className="hover:text-red-700 dark:hover:text-red-400 transition-colors">dailybarguna01@gmail.com</a>
                 </li>
               </ul>
             </div>
           </div>
           
-          <div className="pt-8 border-t border-gray-800 text-center md:flex md:justify-between md:text-left text-sm text-gray-500">
+          <div className="pt-8 border-t border-gray-200 dark:border-gray-800 text-center md:flex md:justify-between md:text-left text-sm text-gray-500">
             <p>&copy; {new Date().getFullYear()} দৈনিক বরগুনা। সর্বস্বত্ব সংরক্ষিত।</p>
             <div className="mt-4 md:mt-0 space-x-4">
-              <Link to="/about" className="hover:text-white transition-colors">আমাদের সম্পর্কে</Link>
-              <Link to="/privacy" className="hover:text-white transition-colors">গোপনীয়তা নীতি</Link>
-              <Link to="/terms" className="hover:text-white transition-colors">ব্যবহারের শর্তাবলী</Link>
-              <Link to="/contact" className="hover:text-white transition-colors">যোগাযোগ</Link>
+              <Link to="/about" className="hover:text-red-700 dark:hover:text-white transition-colors">আমাদের সম্পর্কে</Link>
+              <Link to="/privacy" className="hover:text-red-700 dark:hover:text-white transition-colors">গোপনীয়তা নীতি</Link>
+              <Link to="/terms" className="hover:text-red-700 dark:hover:text-white transition-colors">ব্যবহারের শর্তাবলী</Link>
+              <Link to="/contact" className="hover:text-red-700 dark:hover:text-white transition-colors">যোগাযোগ</Link>
             </div>
           </div>
         </div>

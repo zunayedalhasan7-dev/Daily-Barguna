@@ -106,20 +106,20 @@ export default function NewsDetail() {
           {article.title}
         </h1>
 
-        <div className="flex flex-wrap items-center justify-between py-4 border-y border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-400 gap-4">
-          <div className="flex items-center space-x-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between py-4 border-y border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-400 gap-4">
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
             <div className="flex items-center space-x-2">
-              <User size={16} />
+              <User size={16} className="text-red-600" />
               <span className="font-medium text-gray-900 dark:text-gray-300">{article.author}</span>
             </div>
             <div className="flex items-center space-x-2">
-              <Clock size={16} />
+              <Clock size={16} className="text-red-600" />
               <time dateTime={safeDate(article.publishDate).toISOString()}>
-                {format(safeDate(article.publishDate), "d MMMM yyyy, h:mm a", { locale: bn })}
+                {format(safeDate(article.publishDate), "d MMMM yyyy", { locale: bn })}
               </time>
             </div>
             <div className="flex items-center space-x-2">
-              <Eye size={16} />
+              <Eye size={16} className="text-red-600" />
               <span>{article.views} পঠিত</span>
             </div>
           </div>

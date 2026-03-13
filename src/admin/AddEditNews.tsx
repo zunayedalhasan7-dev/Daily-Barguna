@@ -251,7 +251,7 @@ export default function AddEditNews() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-8 bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+      <form onSubmit={handleSubmit} className="space-y-8 bg-white dark:bg-gray-800 p-4 sm:p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
         
         {/* Basic Info */}
         <div className="space-y-6">

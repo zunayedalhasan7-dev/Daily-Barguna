@@ -50,9 +50,9 @@ export default function HeadlineTicker() {
 
   return (
     <div className="bg-red-700 text-white flex items-center overflow-hidden border-b-4 border-red-900">
-      <div className="bg-red-900 px-4 py-2 flex items-center space-x-2 z-10 whitespace-nowrap font-bold shadow-md">
-        <Megaphone size={18} className="animate-pulse" />
-        <span>শিরোনাম</span>
+      <div className="bg-red-900 px-3 sm:px-4 py-2 flex items-center space-x-2 z-10 whitespace-nowrap font-bold shadow-md">
+        <Megaphone size={16} className="animate-pulse sm:w-[18px] sm:h-[18px]" />
+        <span className="text-xs sm:text-sm">শিরোনাম</span>
       </div>
       <div className="flex-1 overflow-hidden relative h-full flex items-center" ref={containerRef}>
         <motion.div 

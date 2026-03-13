@@ -59,7 +59,7 @@ export default function RamadanTimer() {
     <motion.div 
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-gradient-to-r from-emerald-900 to-teal-900 text-white py-3 border-b border-emerald-800"
+      className="bg-emerald-50 dark:bg-gradient-to-r dark:from-emerald-900 dark:to-teal-900 text-emerald-900 dark:text-white py-3 border-b border-emerald-200 dark:border-emerald-800"
     >
       <audio 
         ref={audioRef} 
@@ -68,22 +68,22 @@ export default function RamadanTimer() {
         onPause={() => setIsPlaying(false)}
         onEnded={() => setIsPlaying(false)}
       />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-12">
         <div className="flex items-center gap-2">
-          <Moon className="text-emerald-400" size={20} />
-          <span className="text-sm font-medium text-emerald-100">সেহরির শেষ সময়:</span>
-          <span className="text-lg font-bold font-serif">{timer.sehriTime}</span>
+          <Moon className="text-emerald-600 dark:text-emerald-400" size={16} />
+          <span className="text-xs sm:text-sm font-medium text-emerald-800 dark:text-emerald-100">সেহরির শেষ সময়:</span>
+          <span className="text-base sm:text-lg font-bold font-serif">{timer.sehriTime}</span>
         </div>
-        <div className="hidden sm:block h-4 w-px bg-emerald-700"></div>
+        <div className="hidden sm:block h-4 w-px bg-emerald-300 dark:bg-emerald-700"></div>
         <div className="flex items-center gap-2">
-          <Sun className="text-orange-400" size={20} />
-          <span className="text-sm font-medium text-emerald-100">ইফতারের সময়:</span>
-          <span className="text-lg font-bold font-serif">{timer.iftarTime}</span>
+          <Sun className="text-orange-600 dark:text-orange-400" size={16} />
+          <span className="text-xs sm:text-sm font-medium text-emerald-800 dark:text-emerald-100">ইফতারের সময়:</span>
+          <span className="text-base sm:text-lg font-bold font-serif">{timer.iftarTime}</span>
         </div>
         {isPlaying && (
           <button 
             onClick={stopAudio}
-            className="text-xs bg-red-800 hover:bg-red-700 px-3 py-1 rounded-full transition-colors flex items-center gap-1"
+            className="text-xs bg-red-600 dark:bg-red-800 text-white hover:bg-red-700 px-3 py-1 rounded-full transition-colors flex items-center gap-1"
           >
             <VolumeX size={14} />
             আজান বন্ধ করুন
@@ -101,7 +101,7 @@ export default function RamadanTimer() {
                 setIsAlertEnabled(true); // Still enable even if unlock fails
               });
             }}
-            className="text-xs bg-emerald-700 hover:bg-emerald-600 px-3 py-1 rounded-full transition-colors flex items-center gap-1"
+            className="text-xs bg-emerald-600 dark:bg-emerald-700 text-white hover:bg-emerald-700 dark:hover:bg-emerald-600 px-3 py-1 rounded-full transition-colors flex items-center gap-1"
           >
             <Volume2 size={14} />
             ইফতার এলার্ট চালু করুন

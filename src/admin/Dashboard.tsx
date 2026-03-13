@@ -2,7 +2,8 @@ import React, { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { newsService, NewsArticle, Ticker, Ad, SocialLinks, RamadanTimer, PageSettings, safeDate } from "../services/newsService";
-import { FileText, Eye, TrendingUp, Clock, Edit, Trash2, Megaphone, PlusCircle, Image as ImageIcon, Share2, Save, Moon, Info, Shield, FileCheck, Mail, Radio, CheckCircle, AlertCircle } from "lucide-react";
+import { isConfigValid } from "../firebase";
+import { FileText, Eye, TrendingUp, Clock, Edit, Trash2, Megaphone, PlusCircle, Image as ImageIcon, Share2, Save, Moon, Info, Shield, FileCheck, Mail, Radio, CheckCircle, AlertCircle, WifiOff } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { bn } from "date-fns/locale";
 import { motion, AnimatePresence } from "motion/react";
@@ -39,10 +40,27 @@ export default function Dashboard() {
   const [newAdLinkUrl, setNewAdLinkUrl] = useState("");
 
   const [notification, setNotification] = useState<{ message: string; type: "success" | "error" } | null>(null);
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    message: string;
+    onConfirm: () => void;
+  }>({
+    isOpen: false,
+    message: "",
+    onConfirm: () => {},
+  });
 
   const showNotification = (message: string, type: "success" | "error" = "success") => {
     setNotification({ message, type });
     setTimeout(() => setNotification(null), 3000);
+  };
+
+  const openConfirm = (message: string, onConfirm: () => void) => {
+    setConfirmModal({ isOpen: true, message, onConfirm });
+  };
+
+  const closeConfirm = () => {
+    setConfirmModal(prev => ({ ...prev, isOpen: false }));
   };
 
   useEffect(() => {
@@ -90,7 +108,7 @@ export default function Dashboard() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const handleDelete = async (id: string) => {
-    if (confirm("আপনি কি নিশ্চিত যে এই সংবাদটি মুছে ফেলতে চান?")) {
+    openConfirm("আপনি কি নিশ্চিত যে এই সংবাদটি মুছে ফেলতে চান?", async () => {
       setDeletingId(id);
       try {
         await newsService.deleteNews(id);
@@ -102,8 +120,9 @@ export default function Dashboard() {
         showNotification("সংবাদ মুছতে সমস্যা হয়েছে।", "error");
       } finally {
         setDeletingId(null);
+        closeConfirm();
       }
-    }
+    });
   };
 
   const handleAddTicker = async (e: React.FormEvent) => {
@@ -119,7 +138,7 @@ export default function Dashboard() {
   };
 
   const handleDeleteTicker = async (id: string) => {
-    if (confirm("আপনি কি নিশ্চিত যে এই শিরোনামটি মুছে ফেলতে চান?")) {
+    openConfirm("আপনি কি নিশ্চিত যে এই শিরোনামটি মুছে ফেলতে চান?", async () => {
       try {
         await newsService.deleteTicker(id);
         setTickers(tickers.filter(t => t.id !== id));
@@ -127,8 +146,10 @@ export default function Dashboard() {
       } catch (error) {
         console.error("Error deleting ticker:", error);
         showNotification("শিরোনাম মুছতে সমস্যা হয়েছে।", "error");
+      } finally {
+        closeConfirm();
       }
-    }
+    });
   };
 
   const handleAddAd = async (e: React.FormEvent) => {
@@ -145,7 +166,7 @@ export default function Dashboard() {
   };
 
   const handleDeleteAd = async (id: string) => {
-    if (confirm("আপনি কি নিশ্চিত যে এই বিজ্ঞাপনটি মুছে ফেলতে চান?")) {
+    openConfirm("আপনি কি নিশ্চিত যে এই বিজ্ঞাপনটি মুছে ফেলতে চান?", async () => {
       try {
         await newsService.deleteAd(id);
         setAds(ads.filter(a => a.id !== id));
@@ -153,8 +174,10 @@ export default function Dashboard() {
       } catch (error) {
         console.error("Error deleting ad:", error);
         showNotification("বিজ্ঞাপন মুছতে সমস্যা হয়েছে।", "error");
+      } finally {
+        closeConfirm();
       }
-    }
+    });
   };
 
   const handleUpdateSocialLinks = async (e: React.FormEvent) => {
@@ -290,13 +313,69 @@ export default function Dashboard() {
         )}
       </AnimatePresence>
 
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">ড্যাশবোর্ড</h1>
-        <Link to="/admin/news/add" className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-md transition-colors font-medium flex items-center gap-2">
+      {/* Confirmation Modal */}
+      <AnimatePresence>
+        {confirmModal.isOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={closeConfirm}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 max-w-sm w-full border border-gray-200 dark:border-gray-700"
+            >
+              <div className="flex flex-col items-center text-center space-y-4">
+                <div className="p-3 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-full">
+                  <AlertCircle size={32} />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white">নিশ্চিত করুন</h3>
+                <p className="text-gray-600 dark:text-gray-400">{confirmModal.message}</p>
+                <div className="flex gap-3 w-full pt-2">
+                  <button
+                    onClick={closeConfirm}
+                    className="flex-1 px-4 py-2.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-bold hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                  >
+                    না
+                  </button>
+                  <button
+                    onClick={confirmModal.onConfirm}
+                    className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-colors shadow-lg shadow-red-600/20"
+                  >
+                    হ্যাঁ, মুছুন
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">ড্যাশবোর্ড</h1>
+        <Link to="/admin/news/add" className="w-full sm:w-auto px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-md transition-colors font-medium flex items-center justify-center gap-2">
           <FileText size={18} />
           নতুন সংবাদ
         </Link>
       </div>
+
+      {!isConfigValid && (
+        <div className="bg-amber-50 dark:bg-amber-900/30 border-l-4 border-amber-500 p-4 rounded-xl flex items-start shadow-sm">
+          <WifiOff className="text-amber-500 mr-3 mt-0.5 shrink-0" size={24} />
+          <div>
+            <h3 className="text-amber-800 dark:text-amber-200 font-bold">Firebase কানেক্ট করা নেই!</h3>
+            <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
+              আপনার Vercel বা হোস্টিং এনভায়রনমেন্টে Firebase এর API Key গুলো সেট করা নেই। এর ফলে রিয়েল-টাইম ডেটাবেস কাজ করবে না। 
+              অনুগ্রহ করে Vercel Settings এ গিয়ে <code className="bg-amber-100 dark:bg-amber-800 px-1 rounded font-mono">VITE_FIREBASE_*</code> ভেরিয়েবলগুলো সেট করুন।
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -339,7 +418,7 @@ export default function Dashboard() {
             </h2>
             <Link to="/admin/news" className="text-sm text-red-600 hover:text-red-800 dark:text-red-400 font-medium">সব দেখুন</Link>
           </div>
-          <div className="overflow-x-auto">
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-gray-50 dark:bg-gray-800/80 text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">
@@ -389,6 +468,40 @@ export default function Dashboard() {
                 )}
               </tbody>
             </table>
+          </div>
+
+          {/* Mobile News List */}
+          <div className="md:hidden divide-y divide-gray-200 dark:divide-gray-700">
+            {news.slice(0, 10).map((article) => (
+              <div key={article.id} className="p-4 space-y-3">
+                <div className="flex gap-3">
+                  <img src={article.imageUrl} alt="" className="w-16 h-16 rounded object-cover shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-bold text-gray-900 dark:text-white line-clamp-2 text-sm">{article.title}</h3>
+                    <p className="text-[10px] text-gray-500 mt-1">
+                      {article.category} • {formatDistanceToNow(safeDate(article.publishDate), { addSuffix: true, locale: bn })}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Link to={`/admin/news/edit/${article.id}`} className="flex-1 flex items-center justify-center gap-2 py-2 text-blue-600 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-xs font-bold">
+                    <Edit size={14} /> এডিট
+                  </Link>
+                  <button 
+                    onClick={() => handleDelete(article.id)} 
+                    disabled={deletingId === article.id}
+                    className="flex-1 flex items-center justify-center gap-2 py-2 text-red-600 bg-red-50 dark:bg-red-900/20 rounded-lg text-xs font-bold disabled:opacity-50"
+                  >
+                    <Trash2 size={14} /> {deletingId === article.id ? "মুছছে..." : "ডিলিট"}
+                  </button>
+                </div>
+              </div>
+            ))}
+            {news.length === 0 && (
+              <div className="p-8 text-center text-gray-500 dark:text-gray-400">
+                কোনো সংবাদ পাওয়া যায়নি।
+              </div>
+            )}
           </div>
         </div>
 

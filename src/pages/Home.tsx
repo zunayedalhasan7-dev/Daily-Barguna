@@ -46,7 +46,7 @@ export default function Home() {
   const otherLatest = latestNews.slice(1, 7);
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-6 sm:space-y-12">
       <Helmet>
         <title>দৈনিক বরগুনা - বরগুনার সর্বশেষ খবর</title>
         <meta name="description" content="দৈনিক বরগুনা - বরগুনা সদর, আমতলী, পাথরঘাটা, বেতাগী, বামনা ও তালতলী সহ সারাদেশের সর্বশেষ খবর।" />
@@ -54,20 +54,20 @@ export default function Home() {
 
       {/* Featured Section */}
       {featuredArticle && (
-        <section className="mb-12">
+        <section className="mb-6 sm:mb-12">
           <NewsCard article={featuredArticle} featured={true} />
         </section>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12">
         {/* Main Content Column */}
-        <div className="lg:col-span-8 space-y-12">
+        <div className="lg:col-span-8 space-y-8 sm:space-y-12">
           
           {/* Latest News List */}
           <section>
-            <div className="flex items-center justify-between mb-6 border-b-2 border-red-700 pb-2">
-              <h2 className="text-2xl font-bold font-serif text-gray-900 dark:text-white">সর্বশেষ খবর</h2>
-              <Link to="/latest" className="text-sm text-red-700 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 font-medium">সব খবর দেখুন &rarr;</Link>
+            <div className="flex items-center justify-between mb-4 sm:mb-6 border-b-2 border-red-700 pb-2">
+              <h2 className="text-xl sm:text-2xl font-bold font-serif text-gray-900 dark:text-white">সর্বশেষ খবর</h2>
+              <Link to="/latest" className="text-xs sm:text-sm text-red-700 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 font-medium">সব খবর দেখুন &rarr;</Link>
             </div>
             <div className="flex flex-col">
               {otherLatest.map(article => (
@@ -82,9 +82,9 @@ export default function Home() {
             if (catNews.length === 0) return null;
             return (
               <section key={category}>
-                <div className="flex items-center justify-between mb-6 border-b-2 border-red-700 pb-2">
-                  <h2 className="text-2xl font-bold font-serif text-gray-900 dark:text-white">{category}</h2>
-                  <Link to={`/category/${category}`} className="text-sm text-red-700 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 font-medium">আরও দেখুন &rarr;</Link>
+                <div className="flex items-center justify-between mb-4 sm:mb-6 border-b-2 border-red-700 pb-2">
+                  <h2 className="text-xl sm:text-2xl font-bold font-serif text-gray-900 dark:text-white">{category}</h2>
+                  <Link to={`/category/${category}`} className="text-xs sm:text-sm text-red-700 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 font-medium">আরও দেখুন &rarr;</Link>
                 </div>
                 <div className="flex flex-col">
                   {catNews.map(article => (
