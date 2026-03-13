@@ -1,0 +1,152 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: news
+    // Document ID: auto-generated
+    // Fields:
+    //   - title: string (required, 1-200)
+    //   - description: string (required, 1-500)
+    //   - content: string (required, 1-5000)
+    //   - imageUrl: string (required, valid URL)
+    //   - videoUrl: string (optional, valid URL)
+    //   - category: string (required)
+    //   - author: string (required)
+    //   - publishDate: timestamp/number (required)
+    //   - views: number (required, >= 0)
+    //   - trending: boolean (required)
+    //   - keywords: list (required, < 20 items, each string < 50)
+    //   - union: string (optional)
+    //
+    // Collection: tickers
+    // Document ID: auto-generated
+    // Fields:
+    //   - text: string (required, 1-200)
+    //   - isActive: boolean (required)
+    //   - createdAt: timestamp/number (required)
+    //
+    // Collection: ads
+    // Document ID: auto-generated
+    // Fields:
+    //   - imageUrl: string (required, valid URL)
+    //   - linkUrl: string (required, valid URL)
+    //   - isActive: boolean (required)
+    //   - createdAt: timestamp/number (required)
+    //
+    // Collection: settings
+    // Document ID: social, ramadan, pages
+    // Fields: (varies)
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+
+    function isAuthenticated() {
+       return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (request.auth.token.email == "zunayedalhasan7@gmail.com" || request.auth.token.email == "xpeee01@gmail.com");
+    }
+
+    function hasRequiredFields(fields) {
+       return request.resource.data.keys().hasAll(fields);
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    function isValidUrl(url) {
+       return url is string &&
+         (url.matches("^https://.*") || url.matches("^http://.*")) &&
+         url.size() < 5000;
+    }
+
+    function isPositive(field) {
+      return request.resource.data[field] is number && request.resource.data[field] >= 0;
+    }
+
+    function isValidList(list, maxSize) {
+      return list is list && list.size() <= maxSize;
+    }
+
+    function areImmutableFieldsUnchanged(fields) {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(fields);
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+
+    function isValidNews(data) {
+      return hasOnlyAllowedFields(['title', 'description', 'content', 'imageUrl', 'imageCaption', 'videoUrl', 'additionalImages', 'category', 'author', 'publishDate', 'views', 'trending', 'keywords', 'union']) &&
+             data.title is string && data.title.size() > 0 && data.title.size() < 500 &&
+             data.description is string && data.description.size() > 0 && data.description.size() < 2000 &&
+             data.content is string && data.content.size() > 0 && data.content.size() < 100000 &&
+             isValidUrl(data.imageUrl) &&
+             (!('imageCaption' in data) || (data.imageCaption is string && data.imageCaption.size() < 500)) &&
+             (!('videoUrl' in data) || isValidUrl(data.videoUrl)) &&
+             (!('additionalImages' in data) || isValidList(data.additionalImages, 20)) &&
+             data.category is string && data.category.size() < 100 &&
+             data.author is string && data.author.size() < 100 &&
+             (data.publishDate is timestamp || data.publishDate is number) &&
+             isPositive('views') &&
+             data.trending is bool &&
+             isValidList(data.keywords, 20) &&
+             (!('union' in data) || (data.union is string && data.union.size() < 100));
+    }
+
+    function isValidTicker(data) {
+      return hasOnlyAllowedFields(['text', 'isActive', 'createdAt']) &&
+             data.text is string && data.text.size() > 0 && data.text.size() < 200 &&
+             data.isActive is bool &&
+             (data.createdAt is timestamp || data.createdAt is number);
+    }
+
+    function isValidAd(data) {
+      return hasOnlyAllowedFields(['imageUrl', 'linkUrl', 'isActive', 'createdAt']) &&
+             isValidUrl(data.imageUrl) &&
+             isValidUrl(data.linkUrl) &&
+             data.isActive is bool &&
+             (data.createdAt is timestamp || data.createdAt is number);
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /news/{newsId} {
+      allow read: if true;
+      allow create: if isAdmin() && hasRequiredFields(['title', 'description', 'content', 'imageUrl', 'category', 'author', 'publishDate', 'views', 'trending', 'keywords']) && isValidNews(request.resource.data);
+      allow update: if isAdmin() && isValidNews(request.resource.data) && areImmutableFieldsUnchanged(['author', 'publishDate']);
+      allow delete: if isAdmin();
+    }
+
+    match /tickers/{tickerId} {
+      allow read: if true;
+      allow create: if isAdmin() && hasRequiredFields(['text', 'isActive', 'createdAt']) && isValidTicker(request.resource.data);
+      allow update: if isAdmin() && isValidTicker(request.resource.data) && areImmutableFieldsUnchanged(['createdAt']);
+      allow delete: if isAdmin();
+    }
+
+    match /ads/{adId} {
+      allow read: if true;
+      allow create: if isAdmin() && hasRequiredFields(['imageUrl', 'linkUrl', 'isActive', 'createdAt']) && isValidAd(request.resource.data);
+      allow update: if isAdmin() && isValidAd(request.resource.data) && areImmutableFieldsUnchanged(['createdAt']);
+      allow delete: if isAdmin();
+    }
+
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}

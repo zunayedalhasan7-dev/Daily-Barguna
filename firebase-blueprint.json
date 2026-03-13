@@ -1,0 +1,108 @@
+{
+  "entities": {
+    "NewsArticle": {
+      "title": "NewsArticle",
+      "description": "A news article.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "content": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "videoUrl": { "type": "string" },
+        "category": { "type": "string" },
+        "author": { "type": "string" },
+        "publishDate": { "type": "number" },
+        "views": { "type": "number" },
+        "trending": { "type": "boolean" },
+        "keywords": { "type": "array" },
+        "union": { "type": "string" }
+      },
+      "required": ["title", "description", "content", "imageUrl", "category", "author", "publishDate", "views", "trending", "keywords"]
+    },
+    "Ticker": {
+      "title": "Ticker",
+      "description": "A ticker item.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "text": { "type": "string" },
+        "isActive": { "type": "boolean" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["text", "isActive", "createdAt"]
+    },
+    "Ad": {
+      "title": "Ad",
+      "description": "An advertisement.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "linkUrl": { "type": "string" },
+        "isActive": { "type": "boolean" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["imageUrl", "linkUrl", "isActive", "createdAt"]
+    },
+    "SocialLinks": {
+      "title": "SocialLinks",
+      "description": "Social media links.",
+      "type": "object",
+      "properties": {
+        "facebook": { "type": "string" },
+        "twitter": { "type": "string" },
+        "youtube": { "type": "string" },
+        "instagram": { "type": "string" }
+      }
+    },
+    "RamadanTimer": {
+      "title": "RamadanTimer",
+      "description": "Ramadan timer settings.",
+      "type": "object",
+      "properties": {
+        "sehriTime": { "type": "string" },
+        "iftarTime": { "type": "string" },
+        "isActive": { "type": "boolean" }
+      }
+    },
+    "PageSettings": {
+      "title": "PageSettings",
+      "description": "Page settings.",
+      "type": "object",
+      "properties": {
+        "about": { "type": "string" },
+        "privacy": { "type": "string" },
+        "terms": { "type": "string" },
+        "contact": { "type": "string" }
+      }
+    }
+  },
+  "firestore": {
+    "news": {
+      "schema": { "$ref": "NewsArticle" },
+      "description": "News articles collection."
+    },
+    "tickers": {
+      "schema": { "$ref": "Ticker" },
+      "description": "Tickers collection."
+    },
+    "ads": {
+      "schema": { "$ref": "Ad" },
+      "description": "Ads collection."
+    },
+    "settings/social": {
+      "schema": { "$ref": "SocialLinks" },
+      "description": "Social links settings."
+    },
+    "settings/ramadan": {
+      "schema": { "$ref": "RamadanTimer" },
+      "description": "Ramadan timer settings."
+    },
+    "settings/pages": {
+      "schema": { "$ref": "PageSettings" },
+      "description": "Page settings."
+    }
+  }
+}
