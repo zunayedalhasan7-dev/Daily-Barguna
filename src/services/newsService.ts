@@ -8,9 +8,8 @@ export interface NewsArticle {
   description: string;
   content: string;
   imageUrl: string;
-  imageCaption?: string;
   videoUrl?: string;
-  additionalImages?: string[];
+  additionalImages?: { url: string; caption: string }[];
   category: string;
   author: string;
   publishDate: number;
@@ -178,6 +177,7 @@ export interface SearchFilters {
   endDate?: number;
   category?: string;
   author?: string;
+  union?: string;
 }
 
 export const newsService = {
@@ -696,8 +696,13 @@ export const newsService = {
 
   // Parliament Live Detection
   async checkParliamentLive(): Promise<LiveStatus> {
+    const apiKey = process.env.GEMINI_API_KEY || import.meta.env.GEMINI_API_KEY || import.meta.env.VITE_GEMINI_API_KEY;
+    if (!apiKey) {
+      console.warn("Gemini API key is missing, skipping live check.");
+      return { isLive: false };
+    }
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+      const ai = new GoogleGenAI({ apiKey });
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
         contents: "Is the Bangladesh Parliament (Jatiya Sangsad) currently in session and broadcasting live? If yes, provide the live stream URL (usually YouTube). Return JSON: { isLive: boolean, liveUrl?: string, title?: string }",

@@ -27,6 +27,7 @@ export default function AddEditNews() {
   });
   const [keywordsInput, setKeywordsInput] = useState("");
   const [additionalImageUrl, setAdditionalImageUrl] = useState("");
+  const [additionalImageCaption, setAdditionalImageCaption] = useState("");
   const [unionSearch, setUnionSearch] = useState("");
   const [showUnionDropdown, setShowUnionDropdown] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -82,9 +83,10 @@ export default function AddEditNews() {
     if (additionalImageUrl.trim()) {
       setFormData(prev => ({
         ...prev,
-        additionalImages: [...(prev.additionalImages || []), additionalImageUrl.trim()]
+        additionalImages: [...(prev.additionalImages || []), { url: additionalImageUrl.trim(), caption: additionalImageCaption.trim() }]
       }));
       setAdditionalImageUrl("");
+      setAdditionalImageCaption("");
     }
   };
 
@@ -98,6 +100,7 @@ export default function AddEditNews() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Submitting formData:", formData);
     setLoading(true);
     setError("");
 
@@ -119,7 +122,6 @@ export default function AddEditNews() {
           keywords: [],
           union: "",
           additionalImages: [],
-          imageCaption: "",
         });
         setKeywordsInput("");
         setUnionSearch("");
@@ -242,20 +244,8 @@ export default function AddEditNews() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">ছবির ক্যাপশন/নাম (ঐচ্ছিক)</label>
-              <input
-                type="text"
-                name="imageCaption"
-                value={formData.imageCaption || ""}
-                onChange={handleChange}
-                className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
-                placeholder="ছবির ক্যাপশন বা নাম লিখুন"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">অতিরিক্ত ছবি (লিংক)</label>
-              <div className="flex gap-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">অতিরিক্ত ছবি (লিংক ও ক্যাপশন)</label>
+              <div className="flex flex-col gap-2">
                 <input
                   type="url"
                   value={additionalImageUrl}
@@ -263,11 +253,18 @@ export default function AddEditNews() {
                   className="flex-1 px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
                   placeholder="ছবির লিংক দিন"
                 />
+                <input
+                  type="text"
+                  value={additionalImageCaption}
+                  onChange={(e) => setAdditionalImageCaption(e.target.value)}
+                  className="flex-1 px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+                  placeholder="ছবির ক্যাপশন দিন"
+                />
                 <button
                   type="button"
                   onClick={addAdditionalImage}
                   disabled={!additionalImageUrl.trim() || (formData.additionalImages?.length || 0) >= 10}
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2 disabled:opacity-50"
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   <PlusCircle size={18} />
                   যোগ করুন
@@ -275,10 +272,11 @@ export default function AddEditNews() {
               </div>
               
               {formData.additionalImages && formData.additionalImages.length > 0 && (
-                <div className="mt-3 grid grid-cols-3 gap-2">
-                  {formData.additionalImages.map((imgUrl, index) => (
-                    <div key={index} className="relative group rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 aspect-square">
-                      <img src={imgUrl} alt={`Additional ${index}`} className="w-full h-full object-cover" />
+                <div className="mt-3 grid grid-cols-2 gap-2">
+                  {formData.additionalImages.map((img, index) => (
+                    <div key={index} className="relative group rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                      <img src={img.url} alt={`Additional ${index}`} className="w-full h-32 object-cover" />
+                      <div className="p-2 text-xs text-gray-700 dark:text-gray-300 truncate">{img.caption}</div>
                       <button
                         type="button"
                         onClick={() => removeAdditionalImage(index)}

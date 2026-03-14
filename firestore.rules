@@ -87,12 +87,11 @@ service cloud.firestore {
     // ===============================================================
 
     function isValidNews(data) {
-      return hasOnlyAllowedFields(['title', 'description', 'content', 'imageUrl', 'imageCaption', 'videoUrl', 'additionalImages', 'category', 'author', 'publishDate', 'views', 'trending', 'keywords', 'union']) &&
+      return hasOnlyAllowedFields(['title', 'description', 'content', 'imageUrl', 'videoUrl', 'additionalImages', 'category', 'author', 'publishDate', 'views', 'trending', 'keywords', 'union']) &&
              data.title is string && data.title.size() > 0 && data.title.size() < 500 &&
              data.description is string && data.description.size() > 0 && data.description.size() < 2000 &&
              data.content is string && data.content.size() > 0 && data.content.size() < 100000 &&
              isValidUrl(data.imageUrl) &&
-             (!('imageCaption' in data) || (data.imageCaption is string && data.imageCaption.size() < 500)) &&
              (!('videoUrl' in data) || isValidUrl(data.videoUrl)) &&
              (!('additionalImages' in data) || isValidList(data.additionalImages, 20)) &&
              data.category is string && data.category.size() < 100 &&

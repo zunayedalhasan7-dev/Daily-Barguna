@@ -50,8 +50,8 @@ export default function Home() {
   return (
     <div className="space-y-6 sm:space-y-12">
       <Helmet>
-        <title>{t('nav.site_title')} - {t('nav.site_description')}</title>
-        <meta name="description" content={t('nav.site_description')} />
+        <title>{t('site.title')}</title>
+        <meta name="description" content={t('footer.description')} />
       </Helmet>
 
       {/* Featured Section */}
@@ -129,7 +129,7 @@ export default function Home() {
               {t('footer.upazila')}
             </h3>
             <ul className="flex flex-wrap gap-2">
-              {CATEGORIES.filter(c => c !== "সারাদেশ").map(cat => (
+              {CATEGORIES.filter(c => c !== "সারাদেশ" && c !== "বিশ্ব").map(cat => (
                 <li key={cat}>
                   <Link to={`/category/${cat}`} className="inline-block py-1.5 px-3 border border-gray-200 dark:border-gray-600 rounded-sm hover:bg-red-50 dark:hover:bg-red-900/20 text-gray-700 dark:text-gray-300 hover:text-red-700 dark:hover:text-red-400 transition-colors text-sm font-medium">
                     {getCategoryTranslation(cat)}
