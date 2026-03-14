@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link, Outlet, useNavigate, useLocation } from "react-router-dom";
-import { Menu, X, Search, Moon, Sun, ChevronRight, Facebook, Twitter, Youtube, Instagram, Twitter as TwitterIcon } from "lucide-react";
+import { Menu, X, Search, Moon, Sun, ChevronRight, Facebook, Twitter, Youtube, Instagram, Globe } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
+import { useLanguage } from "../context/LanguageContext";
 import { CATEGORIES, newsService, Ad, SocialLinks } from "../services/newsService";
 import HeadlineTicker from "./HeadlineTicker";
 import LiveBanner from "./LiveBanner";
@@ -12,6 +13,7 @@ export default function Layout() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const { theme, toggleTheme } = useTheme();
+  const { language, setLanguage, t, getCategoryTranslation } = useLanguage();
   const [ads, setAds] = useState<Ad[]>([]);
   const [socialLinks, setSocialLinks] = useState<SocialLinks>({
     facebook: "#",
@@ -63,15 +65,17 @@ export default function Layout() {
   }, []);
 
   const formatDateTime = (date: Date) => {
-    const time = date.toLocaleTimeString('bn-BD', { 
+    const locale = language === 'bn' ? 'bn-BD' : 'en-US';
+    
+    const time = date.toLocaleTimeString(locale, { 
       hour: '2-digit', 
       minute: '2-digit', 
       second: '2-digit', 
       hour12: true 
     });
     
-    // Gregorian Date in Bangla
-    const gregorianDate = new Intl.DateTimeFormat('bn-BD', {
+    // Gregorian Date
+    const gregorianDate = new Intl.DateTimeFormat(locale, {
       day: 'numeric',
       month: 'long',
       year: 'numeric',
@@ -79,7 +83,7 @@ export default function Layout() {
     }).format(date);
     
     // Hijri Date
-    const hijriDate = new Intl.DateTimeFormat('bn-BD-u-ca-islamic', {
+    const hijriDate = new Intl.DateTimeFormat(language === 'bn' ? 'bn-BD-u-ca-islamic' : 'en-US-u-ca-islamic', {
       day: 'numeric',
       month: 'long',
       year: 'numeric'
@@ -91,7 +95,7 @@ export default function Layout() {
   const { time, gregorianDate, hijriDate } = formatDateTime(currentTime);
 
   return (
-    <div className="min-h-screen flex flex-col bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300 font-sans">
+    <div className={`min-h-screen flex flex-col bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300 ${language === 'en' ? 'font-inter' : 'font-sans'}`}>
       
       {/* Top Bar (Somoy TV Style) */}
       <div className="bg-gray-100 dark:bg-[#1a1a1a] text-gray-600 dark:text-gray-300 py-1 text-[10px] sm:text-xs border-b border-gray-200 dark:border-gray-800">
@@ -110,6 +114,20 @@ export default function Layout() {
           
           <div className="flex items-center gap-3 sm:gap-6">
             <div className="flex items-center gap-3 sm:gap-4">
+              <div className="flex items-center bg-white dark:bg-gray-800 rounded-full border border-gray-300 dark:border-gray-700 p-0.5">
+                <button 
+                  onClick={() => setLanguage('bn')}
+                  className={`px-2 py-0.5 text-[9px] sm:text-[10px] font-bold rounded-full transition-all ${language === 'bn' ? 'bg-red-700 text-white' : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'}`}
+                >
+                  বাংলা
+                </button>
+                <button 
+                  onClick={() => setLanguage('en')}
+                  className={`px-2 py-0.5 text-[9px] sm:text-[10px] font-bold rounded-full transition-all ${language === 'en' ? 'bg-red-700 text-white' : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'}`}
+                >
+                  EN
+                </button>
+              </div>
               <a 
                 href="#" 
                 onClick={handleAdminClick} 
@@ -169,7 +187,7 @@ export default function Layout() {
             {/* Desktop Navigation */}
             <nav className="hidden md:flex space-x-1">
               <Link to="/" className="px-3 py-2 text-sm font-bold text-gray-900 dark:text-gray-100 hover:text-red-700 dark:hover:text-red-400 transition-colors">
-                প্রচ্ছদ
+                {t('nav.home')}
               </Link>
               {CATEGORIES.slice(0, 5).map(category => (
                 <Link 
@@ -177,12 +195,12 @@ export default function Layout() {
                   to={`/category/${category}`} 
                   className="px-3 py-2 text-sm font-bold text-gray-900 dark:text-gray-100 hover:text-red-700 dark:hover:text-red-400 transition-colors"
                 >
-                  {category}
+                  {getCategoryTranslation(category)}
                 </Link>
               ))}
               <div className="relative group px-3 py-2">
                 <button className="text-sm font-bold text-gray-900 dark:text-gray-100 hover:text-red-700 dark:hover:text-red-400 transition-colors flex items-center">
-                  আরও <ChevronRight size={14} className="ml-1 rotate-90 group-hover:rotate-[-90deg] transition-transform" />
+                  {t('nav.more')} <ChevronRight size={14} className="ml-1 rotate-90 group-hover:rotate-[-90deg] transition-transform" />
                 </button>
                 <div className="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-gray-800 shadow-xl border border-gray-100 dark:border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                   {CATEGORIES.slice(5).map(category => (
@@ -191,16 +209,9 @@ export default function Layout() {
                       to={`/category/${category}`} 
                       className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-gray-700 hover:text-red-700 dark:hover:text-red-400"
                     >
-                      {category}
+                      {getCategoryTranslation(category)}
                     </Link>
                   ))}
-                  <div className="border-t border-gray-100 dark:border-gray-700 my-1"></div>
-                  <Link 
-                    to="/download" 
-                    className="block px-4 py-2 text-sm font-bold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-gray-700"
-                  >
-                    ডাউনলোড (Windows)
-                  </Link>
                 </div>
               </div>
             </nav>
@@ -210,7 +221,7 @@ export default function Layout() {
               <form onSubmit={handleSearch} className="relative">
                 <input
                   type="text"
-                  placeholder="খুঁজুন..."
+                  placeholder={t('nav.search')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-48 pl-4 pr-10 py-1.5 border-b-2 border-gray-300 dark:border-gray-600 focus:border-red-700 dark:focus:border-red-500 bg-transparent text-sm text-gray-900 dark:text-white transition-colors focus:outline-none placeholder-gray-400"
@@ -254,7 +265,7 @@ export default function Layout() {
               <form onSubmit={handleSearch} className="relative">
                 <input
                   type="text"
-                  placeholder="সংবাদ খুঁজুন..."
+                  placeholder={t('nav.search_placeholder')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-4 pr-10 py-3 border border-gray-300 dark:border-gray-700 rounded-sm bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:border-red-700 focus:ring-1 focus:ring-red-700"
@@ -270,7 +281,7 @@ export default function Layout() {
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="block px-3 py-2 rounded-sm text-base font-bold text-gray-900 dark:text-white hover:bg-red-50 dark:hover:bg-gray-800 hover:text-red-700 dark:hover:text-red-400"
                 >
-                  প্রচ্ছদ
+                  {t('nav.home')}
                 </Link>
                 {CATEGORIES.map(category => (
                   <Link 
@@ -279,7 +290,7 @@ export default function Layout() {
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="block px-3 py-2 rounded-sm text-base font-bold text-gray-900 dark:text-white hover:bg-red-50 dark:hover:bg-gray-800 hover:text-red-700 dark:hover:text-red-400"
                   >
-                    {category}
+                    {getCategoryTranslation(category)}
                   </Link>
                 ))}
                 <Link 
@@ -287,14 +298,7 @@ export default function Layout() {
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="block px-3 py-2 rounded-sm text-base font-bold text-gray-900 dark:text-white hover:bg-red-50 dark:hover:bg-gray-800 hover:text-red-700 dark:hover:text-red-400"
                 >
-                  এলাকা ভিত্তিক সংবাদ
-                </Link>
-                <Link 
-                  to="/download" 
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="block px-3 py-2 rounded-sm text-base font-bold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-gray-800"
-                >
-                  ডাউনলোড (Windows)
+                  {t('nav.unions')}
                 </Link>
               </div>
             </div>
@@ -352,7 +356,7 @@ export default function Layout() {
                 </div>
               </Link>
               <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed max-w-md font-serif">
-                বরগুনা জেলার সর্বশেষ সংবাদ, রাজনীতি, অর্থনীতি, বিনোদন, খেলাধুলা এবং লাইফস্টাইলের নির্ভরযোগ্য উৎস। সত্যের সন্ধানে আমরা সর্বদা অবিচল।
+                {t('footer.description')}
               </p>
               <div className="flex space-x-4">
                 <a href={socialLinks.facebook} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center hover:bg-red-700 transition-colors text-gray-600 dark:text-white"><Facebook size={18} /></a>
@@ -367,12 +371,12 @@ export default function Layout() {
             </div>
 
             <div>
-              <h3 className="text-lg font-bold font-serif mb-6 border-b border-gray-200 dark:border-gray-800 pb-2">উপজেলা সমূহ</h3>
+              <h3 className="text-lg font-bold font-serif mb-6 border-b border-gray-200 dark:border-gray-800 pb-2">{t('footer.upazila')}</h3>
               <ul className="space-y-3">
                 {CATEGORIES.filter(c => c !== "সারাদেশ" && c !== "বিশ্ব").slice(0, 6).map(cat => (
                   <li key={cat}>
                     <Link to={`/category/${cat}`} className="text-gray-600 dark:text-gray-400 hover:text-red-700 dark:hover:text-white transition-colors text-sm flex items-center">
-                      <ChevronRight size={14} className="mr-2 text-red-500" /> {cat}
+                      <ChevronRight size={14} className="mr-2 text-red-500" /> {getCategoryTranslation(cat)}
                     </Link>
                   </li>
                 ))}
@@ -380,18 +384,18 @@ export default function Layout() {
             </div>
 
             <div>
-              <h3 className="text-lg font-bold font-serif mb-6 border-b border-gray-200 dark:border-gray-800 pb-2">যোগাযোগ</h3>
+              <h3 className="text-lg font-bold font-serif mb-6 border-b border-gray-200 dark:border-gray-800 pb-2">{t('footer.contact')}</h3>
               <ul className="space-y-4 text-sm text-gray-600 dark:text-gray-400">
                 <li>
-                  <strong className="block text-gray-900 dark:text-white mb-1">সম্পাদক ও প্রকাশক:</strong>
-                  <Link to="/editor-info" className="hover:text-red-700 dark:hover:text-red-400 transition-colors">মোঃ জুনায়েদ আল হাসান</Link>
+                  <strong className="block text-gray-900 dark:text-white mb-1">{t('footer.editor')}:</strong>
+                  <Link to="/editor-info" className="hover:text-red-700 dark:hover:text-red-400 transition-colors">{t('footer.editor_name')}</Link>
                 </li>
                 <li>
-                  <strong className="block text-gray-900 dark:text-white mb-1">কার্যালয়:</strong>
-                  সদর রোড, বরগুনা - ৮৭০০, বাংলাদেশ
+                  <strong className="block text-gray-900 dark:text-white mb-1">{t('footer.office')}:</strong>
+                  {t('footer.address')}
                 </li>
                 <li>
-                  <strong className="block text-gray-900 dark:text-white mb-1">ইমেইল:</strong>
+                  <strong className="block text-gray-900 dark:text-white mb-1">{t('footer.email')}:</strong>
                   <a href="mailto:dailybarguna01@gmail.com" className="hover:text-red-700 dark:hover:text-red-400 transition-colors">dailybarguna01@gmail.com</a>
                 </li>
               </ul>
@@ -399,12 +403,12 @@ export default function Layout() {
           </div>
           
           <div className="pt-8 border-t border-gray-200 dark:border-gray-800 text-center md:flex md:justify-between md:text-left text-sm text-gray-500">
-            <p>{pageSettings?.copyright || `© ${new Date().getFullYear()} দৈনিক বরগুনা। সর্বস্বত্ব সংরক্ষিত।`}</p>
+            <p>{pageSettings?.copyright || t('footer.copyright').replace('{year}', new Date().getFullYear().toString())}</p>
             <div className="mt-4 md:mt-0 space-x-4">
-              <Link to="/about" className="hover:text-red-700 dark:hover:text-white transition-colors">আমাদের সম্পর্কে</Link>
-              <Link to="/privacy" className="hover:text-red-700 dark:hover:text-white transition-colors">গোপনীয়তা নীতি</Link>
-              <Link to="/terms" className="hover:text-red-700 dark:hover:text-white transition-colors">ব্যবহারের শর্তাবলী</Link>
-              <Link to="/contact" className="hover:text-red-700 dark:hover:text-white transition-colors">যোগাযোগ</Link>
+              <Link to="/about" className="hover:text-red-700 dark:hover:text-white transition-colors">{t('footer.about')}</Link>
+              <Link to="/privacy" className="hover:text-red-700 dark:hover:text-white transition-colors">{t('footer.privacy')}</Link>
+              <Link to="/terms" className="hover:text-red-700 dark:hover:text-white transition-colors">{t('footer.terms')}</Link>
+              <Link to="/contact" className="hover:text-red-700 dark:hover:text-white transition-colors">{t('footer.contact')}</Link>
             </div>
           </div>
         </div>

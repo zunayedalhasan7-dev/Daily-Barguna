@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { newsService, LiveStatus } from "../services/newsService";
 import { Radio, ExternalLink, X } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import { useLanguage } from "../context/LanguageContext";
 
 export default function LiveBanner() {
+  const { t } = useLanguage();
   const [status, setStatus] = useState<LiveStatus>({ isLive: false });
   const [visible, setVisible] = useState(true);
 
@@ -40,11 +42,11 @@ export default function LiveBanner() {
               <span className="relative inline-flex rounded-full h-3 w-3 bg-red-600 dark:bg-white"></span>
             </div>
             <span className="font-bold whitespace-nowrap text-sm md:text-base">
-              {status.title || "Sangsad Live Now 🔴"}
+              {status.title || t('news.live_now')}
             </span>
             <div className="hidden md:block h-4 w-px bg-red-200 dark:bg-white/30"></div>
             <p className="hidden md:block text-sm text-red-600 dark:text-red-100 truncate">
-              জাতীয় সংসদের অধিবেশন সরাসরি সম্প্রচারিত হচ্ছে
+              {t('news.live_desc')}
             </p>
           </div>
           
@@ -55,7 +57,7 @@ export default function LiveBanner() {
               rel="noopener noreferrer"
               className="flex items-center gap-2 bg-red-600 dark:bg-white text-white dark:text-red-600 px-3 py-1 rounded-full text-xs md:text-sm font-bold hover:bg-red-700 dark:hover:bg-red-50 transition-colors whitespace-nowrap shadow-sm"
             >
-              সরাসরি দেখুন
+              {t('news.watch_live')}
               <ExternalLink size={14} />
             </a>
             <button 

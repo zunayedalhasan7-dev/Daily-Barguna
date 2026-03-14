@@ -4,8 +4,10 @@ import { Helmet } from "react-helmet-async";
 import { newsService, NewsArticle } from "../services/newsService";
 import NewsCard from "../components/NewsCard";
 import { motion } from "motion/react";
+import { useLanguage } from "../context/LanguageContext";
 
 export default function Category() {
+  const { t, getCategoryTranslation } = useLanguage();
   const { category } = useParams<{ category: string }>();
   const [news, setNews] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,24 +44,24 @@ export default function Category() {
   return (
     <div>
       <Helmet>
-        <title>{category} - দৈনিক বরগুনা</title>
-        <meta name="description" content={`${category} বিষয়ক সর্বশেষ সংবাদ - দৈনিক বরগুনা`} />
+        <title>{category ? `${getCategoryTranslation(category)} - ${t('site.title')}` : t('site.title')}</title>
+        <meta name="description" content={`${category ? getCategoryTranslation(category) : ''} ${t('news.latest_desc')}`} />
       </Helmet>
 
       <div className="flex items-center justify-between mb-8 pb-4 border-b-4 border-red-600">
         <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white uppercase tracking-wider">
-          {category}
+          {category ? getCategoryTranslation(category) : ''}
         </h1>
         <span className="text-sm font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full">
-          {news.length} টি সংবাদ
+          {news.length} {t('news.count')}
         </span>
       </div>
 
       {news.length === 0 ? (
         <div className="text-center py-20 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-dashed border-gray-300 dark:border-gray-700">
-          <p className="text-xl text-gray-500 dark:text-gray-400 mb-4">এই ক্যাটাগরিতে কোনো সংবাদ পাওয়া যায়নি।</p>
+          <p className="text-xl text-gray-500 dark:text-gray-400 mb-4">{t('news.no_news_category')}</p>
           <Link to="/" className="inline-block px-6 py-2 bg-red-600 text-white font-medium rounded-full hover:bg-red-700 transition-colors">
-            প্রচ্ছদে ফিরে যান
+            {t('nav.home')}
           </Link>
         </div>
       ) : (

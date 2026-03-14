@@ -3,14 +3,16 @@ import { Helmet } from "react-helmet-async";
 import { motion } from "motion/react";
 import { Facebook, MessageCircle, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "../context/LanguageContext";
 
 export default function EditorInfo() {
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4">
       <Helmet>
-        <title>সম্পাদক ও প্রকাশক - দৈনিক বরগুনা</title>
+        <title>{t('editor.title')} - দৈনিক বরগুনা</title>
       </Helmet>
 
       <div className="max-w-md mx-auto">
@@ -19,7 +21,7 @@ export default function EditorInfo() {
           className="mb-8 flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors font-bold"
         >
           <ArrowLeft size={20} />
-          পিছনে যান
+          {t('nav.back')}
         </button>
 
         <motion.div 
@@ -32,12 +34,12 @@ export default function EditorInfo() {
               <span className="text-4xl font-bold">জ</span>
             </div>
             <h1 className="text-2xl font-bold mb-1">মোঃ জুনায়েদ আল হাসান</h1>
-            <p className="text-red-100">সম্পাদক ও প্রকাশক</p>
+            <p className="text-red-100">{t('footer.editor')}</p>
           </div>
 
           <div className="p-8 space-y-6">
             <p className="text-center text-gray-600 dark:text-gray-400 leading-relaxed">
-              দৈনিক বরগুনা-এর সম্পাদক ও প্রকাশক মোঃ জুনায়েদ আল হাসান-এর সাথে যোগাযোগ করতে নিচের মাধ্যমগুলো ব্যবহার করুন।
+              {t('editor.contact_desc')}
             </p>
 
             <div className="space-y-4">

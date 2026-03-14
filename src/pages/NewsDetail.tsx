@@ -3,11 +3,13 @@ import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { newsService, NewsArticle, safeDate } from "../services/newsService";
 import { format } from "date-fns";
-import { bn } from "date-fns/locale";
+import { bn, enUS } from "date-fns/locale";
 import { Facebook, Twitter, Linkedin, Link as LinkIcon, Eye, Clock, User, MapPin, FileText, ExternalLink } from "lucide-react";
 import { motion } from "motion/react";
+import { useLanguage } from "../context/LanguageContext";
 
 export default function NewsDetail() {
+  const { t, language, getCategoryTranslation, getUnionTranslation, getDistrictTranslation } = useLanguage();
   const { id } = useParams<{ id: string }>();
   const [article, setArticle] = useState<NewsArticle | null>(null);
   const [relatedNews, setRelatedNews] = useState<NewsArticle[]>([]);
@@ -56,8 +58,8 @@ export default function NewsDetail() {
   if (!article) {
     return (
       <div className="text-center py-20">
-        <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">সংবাদটি পাওয়া যায়নি</h2>
-        <Link to="/" className="text-red-600 hover:underline">প্রচ্ছদে ফিরে যান</Link>
+        <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">{t('news.no_news')}</h2>
+        <Link to="/" className="text-red-600 hover:underline">{t('nav.home')}</Link>
       </div>
     );
   }
@@ -100,7 +102,7 @@ export default function NewsDetail() {
       {/* Header */}
       <header className="mb-8">
         <div className="flex items-center space-x-2 text-sm text-red-600 dark:text-red-400 font-bold uppercase tracking-wider mb-4">
-          <Link to={`/category/${article.category}`} className="hover:underline">{article.category}</Link>
+          <Link to={`/category/${article.category}`} className="hover:underline">{getCategoryTranslation(article.category)}</Link>
         </div>
         <h1 className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white leading-tight mb-6">
           {article.title}
@@ -115,24 +117,24 @@ export default function NewsDetail() {
             <div className="flex items-center space-x-2">
               <Clock size={16} className="text-red-600" />
               <time dateTime={safeDate(article.publishDate).toISOString()}>
-                {format(safeDate(article.publishDate), "d MMMM yyyy", { locale: bn })}
+                {format(safeDate(article.publishDate), "d MMMM yyyy", { locale: language === 'bn' ? bn : enUS })}
               </time>
             </div>
             <div className="flex items-center space-x-2">
               <Eye size={16} className="text-red-600" />
-              <span>{article.views} পঠিত</span>
+              <span>{article.views} {t('news.views')}</span>
             </div>
             {article.district && (
               <div className="flex items-center space-x-2">
                 <MapPin size={16} className="text-red-600" />
-                <span className="font-bold">{article.district}</span>
+                <span className="font-bold">{getDistrictTranslation(article.district)}</span>
               </div>
             )}
           </div>
 
           {/* Share Buttons */}
           <div className="flex items-center space-x-3">
-            <span className="font-medium mr-2">শেয়ার:</span>
+            <span className="font-medium mr-2">{t('news.share')}:</span>
             <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-colors">
               <Facebook size={16} />
             </a>
@@ -204,8 +206,8 @@ export default function NewsDetail() {
                 <FileText size={24} />
               </div>
               <div>
-                <h4 className="font-bold text-lg">সংযুক্ত ফাইল</h4>
-                <p className="text-sm opacity-70">এই সংবাদের সাথে একটি ফাইল সংযুক্ত আছে</p>
+                <h4 className="font-bold text-lg">{t('news.attached_file')}</h4>
+                <p className="text-sm opacity-70">{t('news.file_attached_desc')}</p>
               </div>
             </div>
             <a 
@@ -214,7 +216,7 @@ export default function NewsDetail() {
               rel="noopener noreferrer"
               className="flex items-center gap-2 px-6 py-3 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-all shadow-lg shadow-red-600/20"
             >
-              ফাইলটি দেখুন <ExternalLink size={18} />
+              {t('news.view_file')} <ExternalLink size={18} />
             </a>
           </div>
         )}
@@ -223,7 +225,7 @@ export default function NewsDetail() {
         {article.additionalImages && article.additionalImages.length > 0 && (
           <div className="mt-10">
             <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 border-b border-gray-200 dark:border-gray-700 pb-2">
-              আরও ছবি
+              {t('news.more_images')}
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {article.additionalImages.map((imgUrl, index) => (
@@ -248,14 +250,14 @@ export default function NewsDetail() {
 
       {/* Tags/Categories */}
       <div className="flex flex-wrap items-center gap-3 mb-12 pb-8 border-b border-gray-200 dark:border-gray-700">
-        <span className="font-bold text-gray-900 dark:text-white">বিষয়:</span>
+        <span className="font-bold text-gray-900 dark:text-white">{t('news.topic')}:</span>
         <Link to={`/category/${article.category}`} className="px-4 py-1.5 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-full text-sm font-medium hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-700 dark:hover:text-red-400 transition-colors">
-          {article.category}
+          {getCategoryTranslation(article.category)}
         </Link>
         {article.union && (
           <Link to={`/union/${encodeURIComponent(article.union)}`} className="px-4 py-1.5 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-full text-sm font-medium hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors flex items-center gap-1">
             <MapPin size={14} />
-            {article.union}
+            {getUnionTranslation(article.union)}
           </Link>
         )}
       </div>
@@ -264,7 +266,7 @@ export default function NewsDetail() {
       {relatedNews.length > 0 && (
         <section>
           <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 border-l-4 border-red-600 pl-3">
-            আরও পড়ুন
+            {t('news.related')}
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {relatedNews.map(news => (

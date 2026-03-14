@@ -8,6 +8,7 @@
 @theme {
   --font-sans: "SolaimanLipi", "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-serif: "SolaimanLipi", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-inter: "Inter", ui-sans-serif, system-ui, sans-serif;
 }
 
 @layer base {

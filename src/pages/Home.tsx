@@ -5,8 +5,10 @@ import { newsService, NewsArticle, CATEGORIES } from "../services/newsService";
 import NewsCard from "../components/NewsCard";
 import UnionSelector from "../components/UnionSelector";
 import { motion } from "motion/react";
+import { useLanguage } from "../context/LanguageContext";
 
 export default function Home() {
+  const { t, getCategoryTranslation } = useLanguage();
   const [latestNews, setLatestNews] = useState<NewsArticle[]>([]);
   const [trendingNews, setTrendingNews] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,8 +50,8 @@ export default function Home() {
   return (
     <div className="space-y-6 sm:space-y-12">
       <Helmet>
-        <title>দৈনিক বরগুনা - বরগুনার সর্বশেষ খবর</title>
-        <meta name="description" content="দৈনিক বরগুনা - বরগুনা সদর, আমতলী, পাথরঘাটা, বেতাগী, বামনা ও তালতলী সহ সারাদেশের সর্বশেষ খবর।" />
+        <title>{t('nav.site_title')} - {t('nav.site_description')}</title>
+        <meta name="description" content={t('nav.site_description')} />
       </Helmet>
 
       {/* Featured Section */}
@@ -66,8 +68,8 @@ export default function Home() {
           {/* Latest News List */}
           <section>
             <div className="flex items-center justify-between mb-4 sm:mb-6 border-b-2 border-red-700 pb-2">
-              <h2 className="text-xl sm:text-2xl font-bold font-serif text-gray-900 dark:text-white">সর্বশেষ খবর</h2>
-              <Link to="/latest" className="text-xs sm:text-sm text-red-700 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 font-medium">সব খবর দেখুন &rarr;</Link>
+              <h2 className="text-xl sm:text-2xl font-bold font-serif text-gray-900 dark:text-white">{t('common.latest')}</h2>
+              <Link to="/latest" className="text-xs sm:text-sm text-red-700 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 font-medium">{t('common.read_more')} &rarr;</Link>
             </div>
             <div className="flex flex-col">
               {otherLatest.map(article => (
@@ -77,15 +79,15 @@ export default function Home() {
           </section>
 
           {/* Category Sections */}
-          {CATEGORIES.slice(0, 2).map(category => {
-            const catNews = latestNews.filter(n => n.category === category).slice(0, 4);
-            if (catNews.length === 0) return null;
-            return (
-              <section key={category}>
-                <div className="flex items-center justify-between mb-4 sm:mb-6 border-b-2 border-red-700 pb-2">
-                  <h2 className="text-xl sm:text-2xl font-bold font-serif text-gray-900 dark:text-white">{category}</h2>
-                  <Link to={`/category/${category}`} className="text-xs sm:text-sm text-red-700 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 font-medium">আরও দেখুন &rarr;</Link>
-                </div>
+            {CATEGORIES.slice(0, 2).map(category => {
+              const catNews = latestNews.filter(n => n.category === category).slice(0, 4);
+              if (catNews.length === 0) return null;
+              return (
+                <section key={category}>
+                  <div className="flex items-center justify-between mb-4 sm:mb-6 border-b-2 border-red-700 pb-2">
+                    <h2 className="text-xl sm:text-2xl font-bold font-serif text-gray-900 dark:text-white">{getCategoryTranslation(category)}</h2>
+                    <Link to={`/category/${category}`} className="text-xs sm:text-sm text-red-700 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 font-medium">{t('common.read_more')} &rarr;</Link>
+                  </div>
                 <div className="flex flex-col">
                   {catNews.map(article => (
                     <NewsCard key={article.id} article={article} />
@@ -103,7 +105,7 @@ export default function Home() {
           
           <div className="bg-gray-50 dark:bg-gray-800/50 rounded-none border border-gray-200 dark:border-gray-700 p-6">
             <h3 className="text-xl font-bold font-serif text-gray-900 dark:text-white mb-6 border-l-4 border-red-700 pl-3 uppercase tracking-wide">
-              সর্বাধিক পঠিত
+              {t('common.popular')}
             </h3>
             <div className="space-y-6">
               {trendingNews.map((article, index) => (
@@ -124,13 +126,13 @@ export default function Home() {
           {/* Categories List */}
           <div className="bg-white dark:bg-gray-800 rounded-none border border-gray-200 dark:border-gray-700 p-6">
             <h3 className="text-xl font-bold font-serif text-gray-900 dark:text-white mb-4 border-l-4 border-red-700 pl-3 uppercase tracking-wide">
-              উপজেলা সমূহ
+              {t('footer.upazila')}
             </h3>
             <ul className="flex flex-wrap gap-2">
               {CATEGORIES.filter(c => c !== "সারাদেশ").map(cat => (
                 <li key={cat}>
                   <Link to={`/category/${cat}`} className="inline-block py-1.5 px-3 border border-gray-200 dark:border-gray-600 rounded-sm hover:bg-red-50 dark:hover:bg-red-900/20 text-gray-700 dark:text-gray-300 hover:text-red-700 dark:hover:text-red-400 transition-colors text-sm font-medium">
-                    {cat}
+                    {getCategoryTranslation(cat)}
                   </Link>
                 </li>
               ))}

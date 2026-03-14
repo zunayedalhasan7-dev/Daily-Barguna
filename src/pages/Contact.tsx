@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Mail } from "lucide-react";
 import { newsService } from "../services/newsService";
+import { useLanguage } from "../context/LanguageContext";
 
 export default function Contact() {
+  const { t } = useLanguage();
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(true);
 
@@ -24,7 +26,7 @@ export default function Contact() {
   return (
     <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
       <Helmet>
-        <title>যোগাযোগ - দৈনিক বরগুনা</title>
+        <title>{t('contact.title')} - দৈনিক বরগুনা</title>
       </Helmet>
 
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
@@ -33,9 +35,9 @@ export default function Contact() {
             <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
               <Mail size={32} />
             </div>
-            <h1 className="text-3xl font-bold font-serif">যোগাযোগ (Contact Us)</h1>
+            <h1 className="text-3xl font-bold font-serif">{t('contact.title')}</h1>
           </div>
-          <p className="text-orange-100 text-lg">আপনার যেকোনো মতামত বা জিজ্ঞাসার জন্য আমাদের সাথে যোগাযোগ করুন</p>
+          <p className="text-orange-100 text-lg">{t('contact.subtitle')}</p>
         </div>
 
         <div className="p-8 md:p-12 space-y-8">

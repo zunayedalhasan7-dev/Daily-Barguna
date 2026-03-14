@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { newsService, NewsArticle, CATEGORIES, SearchFilters, safeDate } from "../services/newsService";
+import { newsService, NewsArticle, CATEGORIES, SearchFilters, safeDate, SEARCHABLE_UNIONS } from "../services/newsService";
 import { formatDistanceToNow, format } from "date-fns";
-import { bn } from "date-fns/locale";
+import { bn, enUS } from "date-fns/locale";
 import { motion, AnimatePresence } from "motion/react";
 import { Search as SearchIcon, Filter, Calendar, User, Tag, X, ChevronDown } from "lucide-react";
+import { useLanguage } from "../context/LanguageContext";
 
 // Helper to highlight text
 const HighlightedText = ({ text, highlight }: { text: string; highlight: string }) => {
@@ -36,6 +37,7 @@ const HighlightedText = ({ text, highlight }: { text: string; highlight: string 
 };
 
 export default function Search() {
+  const { t, language, getCategoryTranslation, getUnionTranslation } = useLanguage();
   const [searchParams, setSearchParams] = useSearchParams();
   const query = searchParams.get("q") || "";
   const [results, setResults] = useState<NewsArticle[]>([]);
@@ -47,6 +49,7 @@ export default function Search() {
   const [filters, setFilters] = useState<SearchFilters>({
     query: query,
     category: searchParams.get("category") || "",
+    union: searchParams.get("union") || "",
     author: searchParams.get("author") || "",
     startDate: searchParams.get("start") ? parseInt(searchParams.get("start")!) : undefined,
     endDate: searchParams.get("end") ? parseInt(searchParams.get("end")!) : undefined,
@@ -67,6 +70,7 @@ export default function Search() {
         const data = await newsService.searchNews({
           query: query,
           category: filters.category,
+          union: filters.union,
           author: filters.author,
           startDate: filters.startDate,
           endDate: filters.endDate,
@@ -116,6 +120,7 @@ export default function Search() {
 
   const activeFiltersCount = [
     filters.category,
+    filters.union,
     filters.author,
     filters.startDate,
     filters.endDate
@@ -137,7 +142,7 @@ export default function Search() {
   return (
     <div>
       <Helmet>
-        <title>অনুসন্ধান: {query} - দৈনিক বরগুনা</title>
+        <title>{t('search.results')}: {query} - দৈনিক বরগুনা</title>
       </Helmet>
 
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-4 border-b-4 border-red-600">
@@ -145,9 +150,9 @@ export default function Search() {
           <SearchIcon size={32} className="text-red-600 dark:text-red-400" />
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
             {query ? (
-              <>অনুসন্ধানের ফলাফল: <span className="text-red-600 dark:text-red-400">"{query}"</span></>
+              <>{t('news.search_results')}: <span className="text-red-600 dark:text-red-400">"{query}"</span></>
             ) : (
-              <>সংবাদ অনুসন্ধান</>
+              <>{t('news.search_news')}</>
             )}
           </h1>
         </div>
@@ -161,7 +166,7 @@ export default function Search() {
           }`}
         >
           <Filter size={16} />
-          ফিল্টার {activeFiltersCount > 0 && `(${activeFiltersCount})`}
+          {t('news.filter')} {activeFiltersCount > 0 && `(${activeFiltersCount})`}
           <ChevronDown size={14} className={`transition-transform ${showFilters ? "rotate-180" : ""}`} />
         </button>
       </div>
@@ -178,16 +183,33 @@ export default function Search() {
               {/* Category Filter */}
               <div className="space-y-2">
                 <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase flex items-center gap-2">
-                  <Tag size={12} /> বিভাগ
+                  <Tag size={12} /> {t('news.category')}
                 </label>
                 <select 
                   value={filters.category}
                   onChange={(e) => handleFilterChange('category', e.target.value)}
                   className="w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-red-600 dark:focus:border-red-500"
                 >
-                  <option value="">সব বিভাগ</option>
+                  <option value="">{t('news.all_categories')}</option>
                   {CATEGORIES.map(cat => (
-                    <option key={cat} value={cat}>{cat}</option>
+                    <option key={cat} value={cat}>{getCategoryTranslation(cat)}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Union Filter */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase flex items-center gap-2">
+                  <Filter size={12} /> {t('news.area')}
+                </label>
+                <select 
+                  value={filters.union}
+                  onChange={(e) => handleFilterChange('union', e.target.value)}
+                  className="w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-red-600 dark:focus:border-red-500"
+                >
+                  <option value="">{t('news.all_areas')}</option>
+                  {SEARCHABLE_UNIONS.map(u => (
+                    <option key={u.search} value={u.name}>{getUnionTranslation(u.name)}</option>
                   ))}
                 </select>
               </div>
@@ -195,14 +217,14 @@ export default function Search() {
               {/* Author Filter */}
               <div className="space-y-2">
                 <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase flex items-center gap-2">
-                  <User size={12} /> লেখক
+                  <User size={12} /> {t('news.author')}
                 </label>
                 <select 
                   value={filters.author}
                   onChange={(e) => handleFilterChange('author', e.target.value)}
                   className="w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-red-600 dark:focus:border-red-500"
                 >
-                  <option value="">সব লেখক</option>
+                  <option value="">{t('news.all_authors')}</option>
                   {authors.map(author => (
                     <option key={author} value={author}>{author}</option>
                   ))}
@@ -212,7 +234,7 @@ export default function Search() {
               {/* Start Date Filter */}
               <div className="space-y-2">
                 <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase flex items-center gap-2">
-                  <Calendar size={12} /> শুরুর তারিখ
+                  <Calendar size={12} /> {t('news.start_date')}
                 </label>
                 <input 
                   type="date"
@@ -225,7 +247,7 @@ export default function Search() {
               {/* End Date Filter */}
               <div className="space-y-2">
                 <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase flex items-center gap-2">
-                  <Calendar size={12} /> শেষ তারিখ
+                  <Calendar size={12} /> {t('news.end_date')}
                 </label>
                 <input 
                   type="date"
@@ -241,7 +263,7 @@ export default function Search() {
                     onClick={clearFilters}
                     className="text-xs font-bold text-red-600 dark:text-red-400 hover:underline flex items-center gap-1"
                   >
-                    <X size={12} /> ফিল্টার মুছুন
+                    <X size={12} /> {t('news.clear_filters')}
                   </button>
                 </div>
               )}
@@ -252,9 +274,9 @@ export default function Search() {
 
       {results.length === 0 ? (
         <div className="text-center py-20 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-dashed border-gray-300 dark:border-gray-700">
-          <p className="text-xl text-gray-500 dark:text-gray-400 mb-4">কোনো ফলাফল পাওয়া যায়নি। অন্য কিছু লিখে চেষ্টা করুন।</p>
+          <p className="text-xl text-gray-500 dark:text-gray-400 mb-4">{t('news.no_results')}</p>
           <Link to="/" className="inline-block px-6 py-2 bg-red-600 text-white font-medium rounded-full hover:bg-red-700 transition-colors">
-            প্রচ্ছদে ফিরে যান
+            {t('nav.home')}
           </Link>
         </div>
       ) : (
@@ -271,7 +293,7 @@ export default function Search() {
               </div>
               <div className="p-4 flex flex-col flex-grow">
                 <span className="text-xs font-semibold text-red-600 dark:text-red-400 mb-2 uppercase tracking-wide">
-                  {article.category}
+                  {getCategoryTranslation(article.category)}
                 </span>
                 <h3 className="text-lg font-bold font-serif text-gray-900 dark:text-white mb-2 leading-snug group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors line-clamp-2">
                   <HighlightedText text={article.title} highlight={query} />
@@ -280,7 +302,10 @@ export default function Search() {
                   <HighlightedText text={article.description} highlight={query} />
                 </p>
                 <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-500 mt-auto">
-                  <span>{formatDistanceToNow(safeDate(article.publishDate), { addSuffix: true, locale: bn })}</span>
+                  <span>{formatDistanceToNow(safeDate(article.publishDate), { addSuffix: true, locale: language === 'bn' ? bn : enUS })}</span>
+                  {article.union && (
+                    <span className="text-red-700 dark:text-red-500 font-medium">{getUnionTranslation(article.union)}</span>
+                  )}
                 </div>
               </div>
             </Link>

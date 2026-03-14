@@ -4,8 +4,10 @@ import { Helmet } from "react-helmet-async";
 import { newsService, NewsArticle } from "../services/newsService";
 import NewsCard from "../components/NewsCard";
 import { MapPin, ArrowLeft } from "lucide-react";
+import { useLanguage } from "../context/LanguageContext";
 
 export default function UnionNews() {
+  const { t, getUnionTranslation } = useLanguage();
   const { unionName } = useParams<{ unionName: string }>();
   const [news, setNews] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(true);
@@ -29,7 +31,7 @@ export default function UnionNews() {
   return (
     <div className="space-y-8">
       <Helmet>
-        <title>{unionName} - এলাকার খবর | দৈনিক বরগুনা</title>
+        <title>{getUnionTranslation(unionName || '')} - {t('nav.area_news')} | {t('nav.site_title')}</title>
       </Helmet>
 
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-200 dark:border-gray-800 pb-6">
@@ -39,10 +41,10 @@ export default function UnionNews() {
           </div>
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white font-serif">
-              {unionName}
+              {getUnionTranslation(unionName || '')}
             </h1>
             <p className="text-gray-500 dark:text-gray-400 text-sm">
-              এই এলাকার সর্বশেষ সংবাদসমূহ
+              {t('news.area_latest')}
             </p>
           </div>
         </div>
@@ -51,7 +53,7 @@ export default function UnionNews() {
           className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-red-700 dark:hover:text-red-400 transition-colors font-medium"
         >
           <ArrowLeft size={18} />
-          প্রচ্ছদে ফিরে যান
+          {t('nav.home')}
         </Link>
       </div>
 
@@ -74,10 +76,10 @@ export default function UnionNews() {
       ) : (
         <div className="text-center py-20 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-700">
           <MapPin size={48} className="mx-auto text-gray-300 mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">এই এলাকায় কোন সংবাদ পাওয়া যায়নি</h2>
-          <p className="text-gray-500 dark:text-gray-400 mb-6">দুঃখিত, বর্তমানে {unionName} ইউনিয়নের কোন সংবাদ আমাদের কাছে নেই।</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t('news.no_news_area')}</h2>
+          <p className="text-gray-500 dark:text-gray-400 mb-6">{t('news.no_news_area_desc').replace('{union}', getUnionTranslation(unionName || ''))}</p>
           <Link to="/" className="inline-flex items-center gap-2 bg-red-600 text-white px-6 py-2 rounded-full hover:bg-red-700 transition-colors">
-            অন্যান্য সংবাদ দেখুন
+            {t('common.read_more')}
           </Link>
         </div>
       )}

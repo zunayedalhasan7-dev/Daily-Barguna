@@ -2,7 +2,8 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { NewsArticle, safeDate } from "../services/newsService";
 import { format } from "date-fns";
-import { bn } from "date-fns/locale";
+import { bn, enUS } from "date-fns/locale";
+import { useLanguage } from "../context/LanguageContext";
 
 interface NewsCardProps {
   article: NewsArticle;
@@ -11,8 +12,9 @@ interface NewsCardProps {
 }
 
 export default function NewsCard({ article, featured = false }: NewsCardProps) {
+  const { language, getCategoryTranslation } = useLanguage();
   const date = safeDate(article.publishDate);
-  const formattedDate = format(date, "d MMMM yyyy", { locale: bn });
+  const formattedDate = format(date, "d MMMM yyyy", { locale: language === 'bn' ? bn : enUS });
 
   if (featured) {
     return (
@@ -28,7 +30,7 @@ export default function NewsCard({ article, featured = false }: NewsCardProps) {
         </div>
         <div className="absolute bottom-0 left-0 right-0 p-4 md:p-8 text-white">
           <span className="inline-block px-2 py-0.5 md:px-3 md:py-1 bg-red-700 text-[10px] md:text-xs font-bold uppercase tracking-wider mb-2 md:mb-4">
-            {article.category}
+            {getCategoryTranslation(article.category)}
           </span>
           <h2 className="text-xl sm:text-2xl md:text-5xl font-bold font-serif leading-tight mb-2 md:mb-3 group-hover:text-red-300 transition-colors drop-shadow-md line-clamp-2 md:line-clamp-none">
             {article.title}
@@ -66,7 +68,7 @@ export default function NewsCard({ article, featured = false }: NewsCardProps) {
         </div>
         <div className="flex flex-col flex-grow justify-center min-w-0">
           <span className="text-[10px] sm:text-xs font-bold text-red-700 dark:text-red-500 mb-0.5 sm:mb-2 uppercase tracking-wide">
-            {article.category}
+            {getCategoryTranslation(article.category)}
           </span>
           <h3 className="text-sm sm:text-2xl font-bold font-serif text-gray-900 dark:text-gray-100 mb-1 leading-tight sm:leading-snug group-hover:text-red-700 dark:group-hover:text-red-400 transition-colors line-clamp-2 break-words">
             {article.title}

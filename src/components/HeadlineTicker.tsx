@@ -2,8 +2,10 @@ import React, { useEffect, useState, useRef } from "react";
 import { newsService, Ticker } from "../services/newsService";
 import { Megaphone } from "lucide-react";
 import { motion, useAnimationFrame, useMotionValue, useTransform } from "motion/react";
+import { useLanguage } from "../context/LanguageContext";
 
 export default function HeadlineTicker() {
+  const { t } = useLanguage();
   const [tickers, setTickers] = useState<Ticker[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLSpanElement>(null);
@@ -52,7 +54,7 @@ export default function HeadlineTicker() {
     <div className="bg-red-700 text-white flex items-center overflow-hidden border-b-4 border-red-900">
       <div className="bg-red-900 px-3 sm:px-4 py-2 flex items-center space-x-2 z-10 whitespace-nowrap font-bold shadow-md">
         <Megaphone size={16} className="animate-pulse sm:w-[18px] sm:h-[18px]" />
-        <span className="text-xs sm:text-sm">শিরোনাম</span>
+        <span className="text-xs sm:text-sm">{t('news.headlines')}</span>
       </div>
       <div className="flex-1 overflow-hidden relative h-full flex items-center" ref={containerRef}>
         <motion.div 

@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { ShieldCheck } from "lucide-react";
 import { newsService } from "../services/newsService";
+import { useLanguage } from "../context/LanguageContext";
 
 export default function PrivacyPolicy() {
+  const { t } = useLanguage();
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(true);
 
@@ -24,7 +26,7 @@ export default function PrivacyPolicy() {
   return (
     <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
       <Helmet>
-        <title>গোপনীয়তা নীতি - দৈনিক বরগুনা</title>
+        <title>{t('privacy.title')} - দৈনিক বরগুনা</title>
       </Helmet>
 
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
@@ -33,9 +35,9 @@ export default function PrivacyPolicy() {
             <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
               <ShieldCheck size={32} />
             </div>
-            <h1 className="text-3xl font-bold font-serif">গোপনীয়তা নীতি (Privacy Policy)</h1>
+            <h1 className="text-3xl font-bold font-serif">{t('privacy.title')}</h1>
           </div>
-          <p className="text-blue-100 text-lg">আপনার তথ্যের নিরাপত্তা আমাদের অগ্রাধিকার</p>
+          <p className="text-blue-100 text-lg">{t('privacy.title')}</p>
         </div>
 
         <div className="p-8 md:p-12 space-y-8">
