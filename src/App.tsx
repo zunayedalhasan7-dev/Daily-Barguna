@@ -22,6 +22,7 @@ import UnionNews from "./pages/UnionNews";
 import AllUnions from "./pages/AllUnions";
 import EditorInfo from "./pages/EditorInfo";
 import WorldNews from "./pages/WorldNews";
+import DownloadPage from "./pages/Download";
 import NotFound from "./pages/NotFound";
 
 // Admin Pages
@@ -55,6 +56,7 @@ export default function App() {
                     <Route path="union/:unionName" element={<UnionNews />} />
                     <Route path="unions" element={<AllUnions />} />
                     <Route path="world" element={<WorldNews />} />
+                    <Route path="download" element={<DownloadPage />} />
                     <Route path="editor-info" element={<EditorInfo />} />
                     <Route path="*" element={<NotFound />} />
                   </Route>

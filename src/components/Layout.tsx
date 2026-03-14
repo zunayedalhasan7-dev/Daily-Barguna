@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, Outlet, useNavigate, useLocation } from "react-router-dom";
-import { Menu, X, Search, Moon, Sun, ChevronRight, Facebook, Twitter, Youtube, Instagram, Globe } from "lucide-react";
+import { Menu, X, Search, Moon, Sun, ChevronRight, Facebook, Twitter, Youtube, Instagram, Globe, Download } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 import { useLanguage } from "../context/LanguageContext";
 import { CATEGORIES, newsService, Ad, SocialLinks } from "../services/newsService";
@@ -238,6 +238,13 @@ export default function Layout() {
               >
                 {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
               </button>
+              <Link
+                to="/download"
+                className="p-2 text-gray-500 hover:text-red-700 dark:text-gray-400 dark:hover:text-white transition-colors rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
+                aria-label="Download App"
+              >
+                <Download size={20} />
+              </Link>
             </div>
 
             {/* Mobile menu button */}
@@ -248,6 +255,13 @@ export default function Layout() {
               >
                 {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
               </button>
+              <Link
+                to="/download"
+                className="p-2 text-gray-500 hover:text-red-700 dark:text-gray-400 dark:hover:text-white transition-colors"
+                aria-label="Download App"
+              >
+                <Download size={20} />
+              </Link>
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="p-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
