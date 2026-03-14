@@ -19,6 +19,8 @@ import TermsConditions from "./pages/TermsConditions";
 import Contact from "./pages/Contact";
 import UnionNews from "./pages/UnionNews";
 import AllUnions from "./pages/AllUnions";
+import EditorInfo from "./pages/EditorInfo";
+import Download from "./pages/Download";
 import NotFound from "./pages/NotFound";
 
 // Admin Pages
@@ -50,6 +52,8 @@ export default function App() {
                   <Route path="contact" element={<Contact />} />
                   <Route path="union/:unionName" element={<UnionNews />} />
                   <Route path="unions" element={<AllUnions />} />
+                  <Route path="editor-info" element={<EditorInfo />} />
+                  <Route path="download" element={<Download />} />
                   <Route path="*" element={<NotFound />} />
                 </Route>
 

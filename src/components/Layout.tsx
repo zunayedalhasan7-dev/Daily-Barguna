@@ -21,6 +21,7 @@ export default function Layout() {
   });
   const navigate = useNavigate();
   const location = useLocation();
+  const [pageSettings, setPageSettings] = useState<any>(null);
 
   const handleAdminClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -30,12 +31,14 @@ export default function Layout() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [activeAds, links] = await Promise.all([
+        const [activeAds, links, settings] = await Promise.all([
           newsService.getActiveAds(),
-          newsService.getSocialLinks()
+          newsService.getSocialLinks(),
+          newsService.getPageSettings()
         ]);
         setAds(activeAds);
         setSocialLinks(links);
+        setPageSettings(settings);
       } catch (error) {
         console.error("Failed to fetch data:", error);
       }
@@ -97,6 +100,8 @@ export default function Layout() {
             <div className="flex items-center gap-2 font-medium">
               <span className="whitespace-nowrap hidden xs:inline">{gregorianDate}</span>
               <span className="text-gray-600 hidden xs:inline">|</span>
+              <span className="whitespace-nowrap hidden sm:inline">{currentTime.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+              <span className="text-gray-600 hidden sm:inline">|</span>
               <span className="whitespace-nowrap">{hijriDate}</span>
               <span className="text-gray-600 hidden sm:inline">|</span>
               <span className="whitespace-nowrap font-bold text-gray-900 dark:text-gray-300">{time}</span>
@@ -189,6 +194,13 @@ export default function Layout() {
                       {category}
                     </Link>
                   ))}
+                  <div className="border-t border-gray-100 dark:border-gray-700 my-1"></div>
+                  <Link 
+                    to="/download" 
+                    className="block px-4 py-2 text-sm font-bold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-gray-700"
+                  >
+                    ডাউনলোড (Windows)
+                  </Link>
                 </div>
               </div>
             </nav>
@@ -277,6 +289,13 @@ export default function Layout() {
                 >
                   এলাকা ভিত্তিক সংবাদ
                 </Link>
+                <Link 
+                  to="/download" 
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="block px-3 py-2 rounded-sm text-base font-bold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-gray-800"
+                >
+                  ডাউনলোড (Windows)
+                </Link>
               </div>
             </div>
           </div>
@@ -350,7 +369,7 @@ export default function Layout() {
             <div>
               <h3 className="text-lg font-bold font-serif mb-6 border-b border-gray-200 dark:border-gray-800 pb-2">উপজেলা সমূহ</h3>
               <ul className="space-y-3">
-                {CATEGORIES.filter(c => c !== "সারাদেশ").slice(0, 6).map(cat => (
+                {CATEGORIES.filter(c => c !== "সারাদেশ" && c !== "বিশ্ব").slice(0, 6).map(cat => (
                   <li key={cat}>
                     <Link to={`/category/${cat}`} className="text-gray-600 dark:text-gray-400 hover:text-red-700 dark:hover:text-white transition-colors text-sm flex items-center">
                       <ChevronRight size={14} className="mr-2 text-red-500" /> {cat}
@@ -365,7 +384,7 @@ export default function Layout() {
               <ul className="space-y-4 text-sm text-gray-600 dark:text-gray-400">
                 <li>
                   <strong className="block text-gray-900 dark:text-white mb-1">সম্পাদক ও প্রকাশক:</strong>
-                  মোঃ জুনায়েদ আল হাসান
+                  <Link to="/editor-info" className="hover:text-red-700 dark:hover:text-red-400 transition-colors">মোঃ জুনায়েদ আল হাসান</Link>
                 </li>
                 <li>
                   <strong className="block text-gray-900 dark:text-white mb-1">কার্যালয়:</strong>
@@ -380,7 +399,7 @@ export default function Layout() {
           </div>
           
           <div className="pt-8 border-t border-gray-200 dark:border-gray-800 text-center md:flex md:justify-between md:text-left text-sm text-gray-500">
-            <p>&copy; {new Date().getFullYear()} দৈনিক বরগুনা। সর্বস্বত্ব সংরক্ষিত।</p>
+            <p>{pageSettings?.copyright || `© ${new Date().getFullYear()} দৈনিক বরগুনা। সর্বস্বত্ব সংরক্ষিত।`}</p>
             <div className="mt-4 md:mt-0 space-x-4">
               <Link to="/about" className="hover:text-red-700 dark:hover:text-white transition-colors">আমাদের সম্পর্কে</Link>
               <Link to="/privacy" className="hover:text-red-700 dark:hover:text-white transition-colors">গোপনীয়তা নীতি</Link>

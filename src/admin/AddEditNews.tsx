@@ -1,10 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { newsService, NewsArticle, CATEGORIES, SEARCHABLE_UNIONS } from "../services/newsService";
-import { Save, X, Image as ImageIcon, Video, Calendar, User, Tag, CheckCircle, Edit, PlusCircle, AlertCircle, Eye, Upload, Search, MapPin } from "lucide-react";
-import { storage } from "../firebase";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { newsService, NewsArticle, CATEGORIES, SEARCHABLE_UNIONS, DISTRICTS } from "../services/newsService";
+import { Save, X, Image as ImageIcon, Video, Calendar, User, Tag, CheckCircle, Edit, PlusCircle, AlertCircle, Eye, Search, MapPin, Link as LinkIcon, FileText } from "lucide-react";
 
 export default function AddEditNews() {
   const { id } = useParams<{ id: string }>();
@@ -23,19 +21,17 @@ export default function AddEditNews() {
     publishDate: Date.now(),
     keywords: [],
     union: "",
+    district: "",
+    fileUrl: "",
+    additionalImages: [],
   });
   const [keywordsInput, setKeywordsInput] = useState("");
+  const [additionalImageUrl, setAdditionalImageUrl] = useState("");
   const [unionSearch, setUnionSearch] = useState("");
   const [showUnionDropdown, setShowUnionDropdown] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPreview, setShowPreview] = useState(false);
-  const [uploadingImage, setUploadingImage] = useState(false);
-  const [uploadingAdditionalImage, setUploadingAdditionalImage] = useState(false);
-  const [uploadingVideo, setUploadingVideo] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const additionalFileInputRef = useRef<HTMLInputElement>(null);
-  const videoInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (isEdit) {
@@ -82,66 +78,13 @@ export default function AddEditNews() {
     setFormData(prev => ({ ...prev, keywords: keywordsArray }));
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setUploadingImage(true);
-    setError("");
-
-    try {
-      if (storage) {
-        const storageRef = ref(storage, `news_images/${Date.now()}_${file.name}`);
-        await uploadBytes(storageRef, file);
-        const url = await getDownloadURL(storageRef);
-        setFormData(prev => ({ ...prev, imageUrl: url }));
-      } else {
-        // Mock upload if Firebase is not configured
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setFormData(prev => ({ ...prev, imageUrl: reader.result as string }));
-        };
-        reader.readAsDataURL(file);
-      }
-    } catch (err) {
-      console.error("Error uploading image:", err);
-      setError("ছবি আপলোড করতে সমস্যা হয়েছে।");
-    } finally {
-      setUploadingImage(false);
-    }
-  };
-
-  const handleAdditionalImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setUploadingAdditionalImage(true);
-    setError("");
-
-    try {
-      if (storage) {
-        const storageRef = ref(storage, `news_images/${Date.now()}_${file.name}`);
-        await uploadBytes(storageRef, file);
-        const url = await getDownloadURL(storageRef);
-        setFormData(prev => ({ 
-          ...prev, 
-          additionalImages: [...(prev.additionalImages || []), url] 
-        }));
-      } else {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setFormData(prev => ({ 
-            ...prev, 
-            additionalImages: [...(prev.additionalImages || []), reader.result as string] 
-          }));
-        };
-        reader.readAsDataURL(file);
-      }
-    } catch (err) {
-      console.error("Error uploading additional image:", err);
-      setError("অতিরিক্ত ছবি আপলোড করতে সমস্যা হয়েছে।");
-    } finally {
-      setUploadingAdditionalImage(false);
+  const addAdditionalImage = () => {
+    if (additionalImageUrl.trim()) {
+      setFormData(prev => ({
+        ...prev,
+        additionalImages: [...(prev.additionalImages || []), additionalImageUrl.trim()]
+      }));
+      setAdditionalImageUrl("");
     }
   };
 
@@ -151,32 +94,6 @@ export default function AddEditNews() {
       newImages.splice(index, 1);
       return { ...prev, additionalImages: newImages };
     });
-  };
-
-  const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setUploadingVideo(true);
-    setError("");
-
-    try {
-      if (storage) {
-        const storageRef = ref(storage, `news_videos/${Date.now()}_${file.name}`);
-        await uploadBytes(storageRef, file);
-        const url = await getDownloadURL(storageRef);
-        setFormData(prev => ({ ...prev, videoUrl: url }));
-      } else {
-        // Mock upload if Firebase is not configured
-        const url = URL.createObjectURL(file);
-        setFormData(prev => ({ ...prev, videoUrl: url }));
-      }
-    } catch (err) {
-      console.error("Error uploading video:", err);
-      setError("ভিডিও আপলোড করতে সমস্যা হয়েছে।");
-    } finally {
-      setUploadingVideo(false);
-    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -305,33 +222,15 @@ export default function AddEditNews() {
             </h3>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">ছবির URL <span className="text-red-500">*</span></label>
-              <div className="flex gap-2">
-                <input
-                  type="url"
-                  name="imageUrl"
-                  required
-                  value={formData.imageUrl}
-                  onChange={handleChange}
-                  className="flex-1 px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
-                  placeholder="https://example.com/image.jpg"
-                />
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  ref={fileInputRef}
-                  onChange={handleImageUpload}
-                />
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={uploadingImage}
-                  className="px-4 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center gap-2 text-gray-700 dark:text-gray-300"
-                >
-                  {uploadingImage ? <span className="animate-spin">⏳</span> : <Upload size={18} />}
-                  আপলোড
-                </button>
-              </div>
+              <input
+                type="url"
+                name="imageUrl"
+                required
+                value={formData.imageUrl}
+                onChange={handleChange}
+                className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+                placeholder="https://example.com/image.jpg"
+              />
               {formData.imageUrl && (
                 <div className="mt-3 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 aspect-video relative group">
                   <img src={formData.imageUrl} alt="Preview" className="w-full h-full object-cover" />
@@ -355,23 +254,23 @@ export default function AddEditNews() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">অতিরিক্ত ছবি (ঐচ্ছিক)</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">অতিরিক্ত ছবি (লিংক)</label>
               <div className="flex gap-2">
                 <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  ref={additionalFileInputRef}
-                  onChange={handleAdditionalImageUpload}
+                  type="url"
+                  value={additionalImageUrl}
+                  onChange={(e) => setAdditionalImageUrl(e.target.value)}
+                  className="flex-1 px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+                  placeholder="ছবির লিংক দিন"
                 />
                 <button
                   type="button"
-                  onClick={() => additionalFileInputRef.current?.click()}
-                  disabled={uploadingAdditionalImage || (formData.additionalImages?.length || 0) >= 10}
-                  className="w-full px-4 py-2.5 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center justify-center gap-2 text-gray-700 dark:text-gray-300 disabled:opacity-50"
+                  onClick={addAdditionalImage}
+                  disabled={!additionalImageUrl.trim() || (formData.additionalImages?.length || 0) >= 10}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2 disabled:opacity-50"
                 >
-                  {uploadingAdditionalImage ? <span className="animate-spin">⏳</span> : <Upload size={18} />}
-                  অতিরিক্ত ছবি আপলোড করুন (সর্বোচ্চ ১০টি)
+                  <PlusCircle size={18} />
+                  যোগ করুন
                 </button>
               </div>
               
@@ -397,32 +296,14 @@ export default function AddEditNews() {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
                 <Video size={16} className="text-gray-500" /> ভিডিও URL (ঐচ্ছিক)
               </label>
-              <div className="flex gap-2">
-                <input
-                  type="url"
-                  name="videoUrl"
-                  value={formData.videoUrl || ""}
-                  onChange={handleChange}
-                  className="flex-1 px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
-                  placeholder="YouTube URL অথবা .mp4/.webm লিংক"
-                />
-                <input
-                  type="file"
-                  accept="video/mp4,video/webm"
-                  className="hidden"
-                  ref={videoInputRef}
-                  onChange={handleVideoUpload}
-                />
-                <button
-                  type="button"
-                  onClick={() => videoInputRef.current?.click()}
-                  disabled={uploadingVideo}
-                  className="px-4 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center gap-2 text-gray-700 dark:text-gray-300"
-                >
-                  {uploadingVideo ? <span className="animate-spin">⏳</span> : <Upload size={18} />}
-                  আপলোড
-                </button>
-              </div>
+              <input
+                type="url"
+                name="videoUrl"
+                value={formData.videoUrl || ""}
+                onChange={handleChange}
+                className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+                placeholder="YouTube URL অথবা .mp4/.webm লিংক"
+              />
               {formData.videoUrl && (
                 <div className="mt-3 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 aspect-video relative group bg-black">
                   {formData.videoUrl.match(/\.(webm|mp4|mov)$/i) ? (
@@ -451,6 +332,20 @@ export default function AddEditNews() {
               <Tag size={20} className="text-green-500" /> মেটাডেটা
             </h3>
             <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
+                <FileText size={16} className="text-gray-500" /> ফাইল লিংক (যেমন: Google Docs)
+              </label>
+              <input
+                type="url"
+                name="fileUrl"
+                value={formData.fileUrl || ""}
+                onChange={handleChange}
+                className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+                placeholder="https://docs.google.com/..."
+              />
+            </div>
+
+            <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">ক্যাটাগরি <span className="text-red-500">*</span></label>
               <select
                 name="category"
@@ -465,6 +360,21 @@ export default function AddEditNews() {
               </select>
             </div>
             
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">জেলা (ঐচ্ছিক)</label>
+              <select
+                name="district"
+                value={formData.district || ""}
+                onChange={handleChange}
+                className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+              >
+                <option value="">জেলা নির্বাচন করুন</option>
+                {DISTRICTS.map(dist => (
+                  <option key={dist} value={dist}>{dist}</option>
+                ))}
+              </select>
+            </div>
+
             <div className="relative">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
                 <MapPin size={16} className="text-gray-500" /> এলাকা/ইউনিয়ন (ঐচ্ছিক)

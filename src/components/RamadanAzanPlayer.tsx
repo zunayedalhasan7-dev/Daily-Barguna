@@ -22,11 +22,11 @@ export default function RamadanAzanPlayer() {
       const now = new Date();
       const currentTimeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
       
-      if (currentTimeStr === ramadanData.iftarTime && !hasPlayed) {
-        if (!audioRef.current) {
-          audioRef.current = new Audio("https://drive.google.com/uc?export=download&id=1vtWed08ucWHeuHcTi2XNEX9RUmN8LNQW");
-          audioRef.current.onended = () => setIsPlaying(false);
-        }
+        if (currentTimeStr === ramadanData.iftarTime && !hasPlayed) {
+          if (!audioRef.current) {
+            audioRef.current = new Audio("https://www.islamcan.com/audio/adhan/azan1.mp3");
+            audioRef.current.onended = () => setIsPlaying(false);
+          }
         
         audioRef.current.play().then(() => setIsPlaying(true)).catch(e => {
           console.error("আজান প্লে করতে সমস্যা হয়েছে। ব্রাউজারে একবার ক্লিক করে আবার চেষ্টা করুন।", e);

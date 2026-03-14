@@ -36,7 +36,7 @@ export default function RamadanTimer() {
       if (now.getHours() === hours && now.getMinutes() === minutes && !hasPlayed) {
         audioRef.current?.play().catch(err => console.error("Audio play error:", err));
         setHasPlayed(true);
-        alert("ইফতারের সময়! আজান শুরু হয়েছে।");
+        // Removed alert as it's forbidden in iframes
       } else if (now.getMinutes() !== minutes) {
         setHasPlayed(false);
       }
@@ -63,7 +63,7 @@ export default function RamadanTimer() {
     >
       <audio 
         ref={audioRef} 
-        src="https://qualified-emerald-ur4fb5rapi.edgeone.app/-%20%20%20%20%20%20%20%20%20%20%20(2).mp3" 
+        src="https://www.islamcan.com/audio/adhan/azan1.mp3" 
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
         onEnded={() => setIsPlaying(false)}

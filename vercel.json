@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/(admindashboard|admin|login)(.*)",
+      "destination": "/404"
+    },
+    {
+      "source": "/((?!admindashboard|admin|login).*)",
+      "destination": "/index.html"
+    }
+  ]
+}

@@ -4,7 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { newsService, NewsArticle, safeDate } from "../services/newsService";
 import { format } from "date-fns";
 import { bn } from "date-fns/locale";
-import { Facebook, Twitter, Linkedin, Link as LinkIcon, Eye, Clock, User, MapPin } from "lucide-react";
+import { Facebook, Twitter, Linkedin, Link as LinkIcon, Eye, Clock, User, MapPin, FileText, ExternalLink } from "lucide-react";
 import { motion } from "motion/react";
 
 export default function NewsDetail() {
@@ -122,6 +122,12 @@ export default function NewsDetail() {
               <Eye size={16} className="text-red-600" />
               <span>{article.views} পঠিত</span>
             </div>
+            {article.district && (
+              <div className="flex items-center space-x-2">
+                <MapPin size={16} className="text-red-600" />
+                <span className="font-bold">{article.district}</span>
+              </div>
+            )}
           </div>
 
           {/* Share Buttons */}
@@ -189,6 +195,29 @@ export default function NewsDetail() {
           className="prose prose-lg dark:prose-invert max-w-none font-serif text-gray-800 dark:text-gray-200 leading-relaxed mb-8"
           dangerouslySetInnerHTML={{ __html: article.content }}
         />
+
+        {/* File Link Attachment */}
+        {article.fileUrl && (
+          <div className="mt-8 p-6 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-4 text-gray-700 dark:text-gray-300">
+              <div className="p-3 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-xl">
+                <FileText size={24} />
+              </div>
+              <div>
+                <h4 className="font-bold text-lg">সংযুক্ত ফাইল</h4>
+                <p className="text-sm opacity-70">এই সংবাদের সাথে একটি ফাইল সংযুক্ত আছে</p>
+              </div>
+            </div>
+            <a 
+              href={article.fileUrl} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-6 py-3 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-all shadow-lg shadow-red-600/20"
+            >
+              ফাইলটি দেখুন <ExternalLink size={18} />
+            </a>
+          </div>
+        )}
         
         {/* Additional Images Gallery */}
         {article.additionalImages && article.additionalImages.length > 0 && (

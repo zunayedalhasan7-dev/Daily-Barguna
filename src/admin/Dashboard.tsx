@@ -27,7 +27,8 @@ export default function Dashboard() {
     about: "",
     privacy: "",
     terms: "",
-    contact: ""
+    contact: "",
+    copyright: ""
   });
   const [loading, setLoading] = useState(true);
   const [savingSocial, setSavingSocial] = useState(false);
@@ -483,14 +484,14 @@ export default function Dashboard() {
                     </p>
                   </div>
                 </div>
-                <div className="flex gap-2">
-                  <Link to={`/admin/news/edit/${article.id}`} className="flex-1 flex items-center justify-center gap-2 py-2 text-blue-600 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-xs font-bold">
+                <div className="flex gap-2 pt-1">
+                  <Link to={`/admin/news/edit/${article.id}`} className="flex-1 flex items-center justify-center gap-2 py-3 text-blue-600 bg-blue-50 dark:bg-blue-900/20 rounded-xl text-xs font-bold active:bg-blue-100 transition-colors">
                     <Edit size={14} /> এডিট
                   </Link>
                   <button 
                     onClick={() => handleDelete(article.id)} 
                     disabled={deletingId === article.id}
-                    className="flex-1 flex items-center justify-center gap-2 py-2 text-red-600 bg-red-50 dark:bg-red-900/20 rounded-lg text-xs font-bold disabled:opacity-50"
+                    className="flex-1 flex items-center justify-center gap-2 py-3 text-red-600 bg-red-50 dark:bg-red-900/20 rounded-xl text-xs font-bold active:bg-red-100 transition-colors disabled:opacity-50"
                   >
                     <Trash2 size={14} /> {deletingId === article.id ? "মুছছে..." : "ডিলিট"}
                   </button>
@@ -818,6 +819,19 @@ export default function Dashboard() {
                   onChange={(e) => setPageSettings({ ...pageSettings, contact: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none h-32"
                   placeholder="HTML কন্টেন্ট এখানে দিন..."
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <CheckCircle size={16} className="text-purple-500" />
+                  কপিরাইট টেক্সট (Copyright Text)
+                </label>
+                <input
+                  type="text"
+                  value={pageSettings.copyright || ""}
+                  onChange={(e) => setPageSettings({ ...pageSettings, copyright: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
+                  placeholder="© 2026 দৈনিক বরগুনা। সর্বস্বত্ব সংরক্ষিত।"
                 />
               </div>
             </div>

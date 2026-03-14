@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /admindashboard/
+Disallow: /login/
+
+Sitemap: https://dailybarguna.vercel.app/sitemap.xml
