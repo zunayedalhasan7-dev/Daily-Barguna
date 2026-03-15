@@ -7,9 +7,9 @@
   "start_url": "/",
   "icons": [
     {
-      "src": "/favicon.svg",
+      "src": "https://i.postimg.cc/Vkj5CSVg/Untitled-design-(4)-(1)-(1)-(1).png",
       "sizes": "192x192 512x512",
-      "type": "image/svg+xml"
+      "type": "image/png"
     }
   ]
 }
