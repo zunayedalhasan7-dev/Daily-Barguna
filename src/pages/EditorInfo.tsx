@@ -12,7 +12,7 @@ export default function EditorInfo() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4">
       <Helmet>
-        <title>{t('editor.title')} - দৈনিক বরগুনা</title>
+        <title>{t('editor.title')} - {t('site.title')}</title>
       </Helmet>
 
       <div className="max-w-md mx-auto">
@@ -31,9 +31,9 @@ export default function EditorInfo() {
         >
           <div className="bg-red-600 p-8 text-center text-white">
             <div className="w-24 h-24 bg-white/20 rounded-full mx-auto mb-4 flex items-center justify-center backdrop-blur-sm border-4 border-white/30">
-              <span className="text-4xl font-bold">জ</span>
+              <span className="text-4xl font-bold">{t('editor.initial')}</span>
             </div>
-            <h1 className="text-2xl font-bold mb-1">মোঃ জুনায়েদ আল হাসান</h1>
+            <h1 className="text-2xl font-bold mb-1">{t('footer.editor_name')}</h1>
             <p className="text-red-100">{t('footer.editor')}</p>
           </div>
 
@@ -53,7 +53,7 @@ export default function EditorInfo() {
                   <div className="p-2 bg-blue-600 text-white rounded-xl group-hover:scale-110 transition-transform">
                     <Facebook size={24} />
                   </div>
-                  <span className="font-bold">ফেসবুক প্রোফাইল</span>
+                  <span className="font-bold">{t('editor.facebook')}</span>
                 </div>
                 <span className="text-sm">@xpzunayed</span>
               </a>
@@ -68,7 +68,7 @@ export default function EditorInfo() {
                   <div className="p-2 bg-green-600 text-white rounded-xl group-hover:scale-110 transition-transform">
                     <MessageCircle size={24} />
                   </div>
-                  <span className="font-bold">হোয়াটসঅ্যাপ</span>
+                  <span className="font-bold">{t('editor.whatsapp')}</span>
                 </div>
                 <span className="text-sm">01626538051</span>
               </a>

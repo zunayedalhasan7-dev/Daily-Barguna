@@ -90,7 +90,7 @@ export default function NewsDetail() {
   return (
     <article className="max-w-4xl mx-auto">
       <Helmet>
-        <title>{article.title} - দৈনিক বরগুনা</title>
+        <title>{article.title} - {t('site.title')}</title>
         <meta name="description" content={article.description} />
         <meta property="og:title" content={article.title} />
         <meta property="og:description" content={article.description} />
@@ -162,7 +162,7 @@ export default function NewsDetail() {
                 className="w-full h-full object-contain"
                 poster={article.imageUrl}
               >
-                আপনার ব্রাউজার ভিডিও ট্যাগ সমর্থন করে না।
+                {t('news.video_not_supported')}
               </video>
             ) : (
               <iframe 
@@ -238,7 +238,7 @@ export default function NewsDetail() {
                 >
                   <img 
                     src={imgUrl} 
-                    alt={`${article.title} - ছবি ${index + 1}`} 
+                    alt={`${article.title} - ${t('news.image')} ${index + 1}`} 
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                   />
                 </a>

@@ -620,7 +620,7 @@ export const newsService = {
       } catch (error: any) {
         console.error("Firestore updateSocialLinks error:", error);
         if (error.code === 'permission-denied') {
-          throw new Error("সেভ করার অনুমতি নেই (Permission Denied)।");
+          throw new Error("Permission Denied.");
         }
         throw error;
       }
@@ -654,7 +654,7 @@ export const newsService = {
       } catch (error: any) {
         console.error("Firestore updateRamadanTimer error:", error);
         if (error.code === 'permission-denied') {
-          throw new Error("ফায়ারবেস ডাটাবেসে সেভ করার অনুমতি নেই। অনুগ্রহ করে সিকিউরিটি রুলস চেক করুন।");
+          throw new Error("Permission Denied. Please check your security rules.");
         }
         throw error;
       }
@@ -687,7 +687,7 @@ export const newsService = {
       } catch (error: any) {
         console.error("Firestore updatePageSettings error:", error);
         if (error.code === 'permission-denied') {
-          throw new Error("সেভ করার অনুমতি নেই (Permission Denied)।");
+          throw new Error("Permission Denied.");
         }
         throw error;
       }
@@ -718,7 +718,7 @@ export const newsService = {
       return {
         isLive: result.isLive || false,
         liveUrl: result.liveUrl || "https://www.youtube.com/@BangladeshParliament/live",
-        title: result.title || "জাতীয় সংসদ সরাসরি সম্প্রচারিত হচ্ছে"
+        title: result.title || "National Parliament is broadcasting live"
       };
     } catch (error: any) {
       const errorString = String(error);

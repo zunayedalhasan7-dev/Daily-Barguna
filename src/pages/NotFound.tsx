@@ -10,7 +10,7 @@ export default function NotFound() {
   return (
     <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4 bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 rounded-3xl my-8">
       <Helmet>
-        <title>{t('notfound.title')} - দৈনিক বরগুনা</title>
+        <title>{t('notfound.title')} - {t('site.title')}</title>
       </Helmet>
       
       <motion.div

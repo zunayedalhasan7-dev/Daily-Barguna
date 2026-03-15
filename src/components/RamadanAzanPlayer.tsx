@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { newsService, RamadanTimer } from "../services/newsService";
+import { useLanguage } from "../context/LanguageContext";
 
 export default function RamadanAzanPlayer() {
+  const { t } = useLanguage();
   const [ramadanData, setRamadanData] = useState<RamadanTimer | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [hasPlayed, setHasPlayed] = useState(false);
@@ -29,7 +31,7 @@ export default function RamadanAzanPlayer() {
           }
         
         audioRef.current.play().then(() => setIsPlaying(true)).catch(e => {
-          console.error("আজান প্লে করতে সমস্যা হয়েছে। ব্রাউজারে একবার ক্লিক করে আবার চেষ্টা করুন।", e);
+          console.error(t('ramadan.azan_error'), e);
         });
         setHasPlayed(true);
       } else if (currentTimeStr !== ramadanData.iftarTime) {
@@ -60,7 +62,7 @@ export default function RamadanAzanPlayer() {
         }}
         className="bg-red-600 text-white px-4 py-2 rounded-full shadow-lg font-bold hover:bg-red-700 transition-colors"
       >
-        আজান বন্ধ করুন
+        {t('ramadan.stop_azan')}
       </button>
     </div>
   );

@@ -34,11 +34,11 @@ import AddEditNews from "./admin/AddEditNews";
 
 export default function App() {
   return (
-    <ErrorBoundary>
-      <RamadanAzanPlayer />
-      <HelmetProvider>
-        <ThemeProvider>
-          <LanguageProvider>
+    <LanguageProvider>
+      <ErrorBoundary>
+        <RamadanAzanPlayer />
+        <HelmetProvider>
+          <ThemeProvider>
             <AuthProvider>
               <Router>
                 <ScrollToTop />
@@ -73,9 +73,9 @@ export default function App() {
                 </Routes>
               </Router>
             </AuthProvider>
-          </LanguageProvider>
-        </ThemeProvider>
-      </HelmetProvider>
-    </ErrorBoundary>
+          </ThemeProvider>
+        </HelmetProvider>
+      </ErrorBoundary>
+    </LanguageProvider>
   );
 }

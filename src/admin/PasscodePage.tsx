@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Lock, ArrowLeft, AlertCircle } from "lucide-react";
 import { motion } from "motion/react";
+import { useLanguage } from "../context/LanguageContext";
 
 export default function PasscodePage() {
   const [passcode, setPasscode] = useState("");
@@ -10,6 +11,7 @@ export default function PasscodePage() {
   const [isLocked, setIsLocked] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (localStorage.getItem("passcode_authenticated") === "true") {
@@ -59,9 +61,9 @@ export default function PasscodePage() {
         localStorage.setItem("passcode_lock_until", lockUntil.toString());
         setIsLocked(true);
         setTimeLeft(60);
-        setError("৩ বার ভুল পাসকোড! ১ মিনিট অপেক্ষা করুন।");
+        setError(t('admin.passcode_locked'));
       } else {
-        setError(`ভুল পাসকোড! আর ${3 - attempts} বার চেষ্টা করতে পারবেন।`);
+        setError(t('admin.passcode_wrong').replace('{attempts}', (3 - attempts).toString()));
       }
       setPasscode("");
     }
@@ -70,7 +72,7 @@ export default function PasscodePage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4 py-12 relative">
       <Helmet>
-        <title>পাসকোড যাচাই - দৈনিক বরগুনা</title>
+        <title>{t('admin.passcode_verify')} - {t('site.title')}</title>
       </Helmet>
 
       <Link 
@@ -78,7 +80,7 @@ export default function PasscodePage() {
         className="absolute top-6 left-6 flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-red-600 transition-colors font-medium text-sm bg-white dark:bg-gray-800 px-4 py-2 rounded-full shadow-sm border border-gray-200 dark:border-gray-700"
       >
         <ArrowLeft size={18} />
-        <span>প্রচ্ছদে ফিরে যান</span>
+        <span>{t('admin.back_to_home')}</span>
       </Link>
       
       <motion.div 
@@ -88,7 +90,7 @@ export default function PasscodePage() {
       >
         <div>
           <h2 className="text-center text-2xl font-extrabold text-gray-900 dark:text-white">
-            পাসকোড দিন
+            {t('admin.enter_passcode')}
           </h2>
         </div>
         
@@ -111,7 +113,7 @@ export default function PasscodePage() {
               value={isLocked ? "" : passcode}
               onChange={(e) => setPasscode(e.target.value)}
               className={`appearance-none block w-full pl-10 px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${isLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
-              placeholder={isLocked ? `অপেক্ষা করুন ${timeLeft} সেকেন্ড` : "পাসকোড"}
+              placeholder={isLocked ? t('admin.wait_seconds').replace('{seconds}', timeLeft.toString()) : t('admin.passcode')}
             />
           </div>
 
@@ -120,7 +122,7 @@ export default function PasscodePage() {
             disabled={isLocked}
             className="w-full py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLocked ? `অপেক্ষা করুন ${timeLeft} সেকেন্ড` : "যাচাই করুন"}
+            {isLocked ? t('admin.wait_seconds').replace('{seconds}', timeLeft.toString()) : t('admin.verify')}
           </button>
         </form>
       </motion.div>

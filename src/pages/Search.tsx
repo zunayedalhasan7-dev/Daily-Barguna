@@ -142,7 +142,7 @@ export default function Search() {
   return (
     <div>
       <Helmet>
-        <title>{t('search.results')}: {query} - দৈনিক বরগুনা</title>
+        <title>{t('search.results')}: {query} - {t('site.title')}</title>
       </Helmet>
 
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-4 border-b-4 border-red-600">

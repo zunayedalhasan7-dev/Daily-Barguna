@@ -8,7 +8,10 @@ import { formatDistanceToNow } from "date-fns";
 import { bn } from "date-fns/locale";
 import { motion, AnimatePresence } from "motion/react";
 
+import { useLanguage } from "../context/LanguageContext";
+
 export default function Dashboard() {
+  const { t } = useLanguage();
   const [news, setNews] = useState<NewsArticle[]>([]);
   const [tickers, setTickers] = useState<Ticker[]>([]);
   const [ads, setAds] = useState<Ad[]>([]);
@@ -109,16 +112,16 @@ export default function Dashboard() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const handleDelete = async (id: string) => {
-    openConfirm("আপনি কি নিশ্চিত যে এই সংবাদটি মুছে ফেলতে চান?", async () => {
+    openConfirm(t('admin.confirm_delete'), async () => {
       setDeletingId(id);
       try {
         await newsService.deleteNews(id);
         // Update UI immediately
         setNews(prev => prev.filter(item => item.id !== id));
-        showNotification("সংবাদটি সফলভাবে মুছে ফেলা হয়েছে।");
+        showNotification(t('admin.delete_success'));
       } catch (error) {
         console.error("Error deleting news:", error);
-        showNotification("সংবাদ মুছতে সমস্যা হয়েছে।", "error");
+        showNotification(t('admin.delete_error'), "error");
       } finally {
         setDeletingId(null);
         closeConfirm();
@@ -139,14 +142,14 @@ export default function Dashboard() {
   };
 
   const handleDeleteTicker = async (id: string) => {
-    openConfirm("আপনি কি নিশ্চিত যে এই শিরোনামটি মুছে ফেলতে চান?", async () => {
+    openConfirm(t('admin.confirm_title_delete'), async () => {
       try {
         await newsService.deleteTicker(id);
         setTickers(tickers.filter(t => t.id !== id));
-        showNotification("শিরোনামটি মুছে ফেলা হয়েছে।");
+        showNotification(t('admin.title_delete_success'));
       } catch (error) {
         console.error("Error deleting ticker:", error);
-        showNotification("শিরোনাম মুছতে সমস্যা হয়েছে।", "error");
+        showNotification(t('admin.title_delete_error'), "error");
       } finally {
         closeConfirm();
       }
@@ -167,14 +170,14 @@ export default function Dashboard() {
   };
 
   const handleDeleteAd = async (id: string) => {
-    openConfirm("আপনি কি নিশ্চিত যে এই বিজ্ঞাপনটি মুছে ফেলতে চান?", async () => {
+    openConfirm(t('admin.confirm_ad_delete'), async () => {
       try {
         await newsService.deleteAd(id);
         setAds(ads.filter(a => a.id !== id));
-        showNotification("বিজ্ঞাপনটি মুছে ফেলা হয়েছে।");
+        showNotification(t('admin.ad_delete_success'));
       } catch (error) {
         console.error("Error deleting ad:", error);
-        showNotification("বিজ্ঞাপন মুছতে সমস্যা হয়েছে।", "error");
+        showNotification(t('admin.ad_delete_error'), "error");
       } finally {
         closeConfirm();
       }
@@ -186,10 +189,10 @@ export default function Dashboard() {
     setSavingSocial(true);
     try {
       await newsService.updateSocialLinks(socialLinks);
-      showNotification("সোশ্যাল মিডিয়া লিংক সফলভাবে আপডেট করা হয়েছে।");
+      showNotification(t('admin.social_update_success'));
     } catch (error) {
       console.error("Error updating social links:", error);
-      showNotification("লিংক আপডেট করতে সমস্যা হয়েছে।", "error");
+      showNotification(t('admin.social_update_error'), "error");
     } finally {
       setSavingSocial(false);
     }
@@ -200,10 +203,10 @@ export default function Dashboard() {
     setSavingRamadan(true);
     try {
       await newsService.updateRamadanTimer(ramadanTimer);
-      showNotification("রমজানের সময়সূচী সফলভাবে আপডেট করা হয়েছে।");
+      showNotification(t('admin.ramadan_update_success'));
     } catch (error: any) {
       console.error("Error updating ramadan timer:", error);
-      showNotification(error.message || "সময়সূচী আপডেট করতে সমস্যা হয়েছে।", "error");
+      showNotification(error.message || t('admin.ramadan_update_error'), "error");
     } finally {
       setSavingRamadan(false);
     }
@@ -214,10 +217,10 @@ export default function Dashboard() {
     setSavingPages(true);
     try {
       await newsService.updatePageSettings(pageSettings);
-      showNotification("পেজ সেটিংস সফলভাবে আপডেট করা হয়েছে।");
+      showNotification(t('admin.page_update_success'));
     } catch (error: any) {
       console.error("Error updating page settings:", error);
-      showNotification(`সেটিংস আপডেট করতে সমস্যা হয়েছে: ${error.message || "Unknown error"}`, "error");
+      showNotification(`${t('admin.page_update_error')} ${error.message || "Unknown error"}`, "error");
     } finally {
       setSavingPages(false);
     }
@@ -234,10 +237,10 @@ export default function Dashboard() {
       await newsService.updateTicker(editingTicker.id, { text: editingTicker.text.trim() });
       setTickers(tickers.map(t => t.id === editingTicker.id ? { ...t, text: editingTicker.text.trim() } : t));
       setEditingTicker(null);
-      showNotification("শিরোনাম আপডেট করা হয়েছে।");
+      showNotification(t('admin.title_update_success'));
     } catch (error) {
       console.error("Error updating ticker:", error);
-      showNotification("শিরোনাম আপডেট করতে সমস্যা হয়েছে।", "error");
+      showNotification(t('admin.title_update_error'), "error");
     }
   };
 
@@ -252,10 +255,10 @@ export default function Dashboard() {
       });
       setAds(ads.map(a => a.id === editingAd.id ? { ...a, imageUrl: editingAd.imageUrl.trim(), linkUrl: editingAd.linkUrl.trim() || "#" } : a));
       setEditingAd(null);
-      showNotification("বিজ্ঞাপন আপডেট করা হয়েছে।");
+      showNotification(t('admin.ad_update_success'));
     } catch (error) {
       console.error("Error updating ad:", error);
-      showNotification("বিজ্ঞাপন আপডেট করতে সমস্যা হয়েছে।", "error");
+      showNotification(t('admin.ad_update_error'), "error");
     }
   };
 
@@ -263,7 +266,7 @@ export default function Dashboard() {
     try {
       await newsService.updateTicker(id, { isActive });
       setTickers(tickers.map(t => t.id === id ? { ...t, isActive } : t));
-      showNotification(`শিরোনাম ${isActive ? "চালু" : "বন্ধ"} করা হয়েছে।`);
+      showNotification(isActive ? t('admin.title_status_on') : t('admin.title_status_off'));
     } catch (error) {
       console.error("Error toggling ticker:", error);
     }
@@ -273,7 +276,7 @@ export default function Dashboard() {
     try {
       await newsService.updateAd(id, { isActive });
       setAds(ads.map(a => a.id === id ? { ...a, isActive } : a));
-      showNotification(`বিজ্ঞাপন ${isActive ? "চালু" : "বন্ধ"} করা হয়েছে।`);
+      showNotification(isActive ? t('admin.ad_status_on') : t('admin.ad_status_off'));
     } catch (error) {
       console.error("Error toggling ad:", error);
     }
@@ -292,7 +295,7 @@ export default function Dashboard() {
   return (
     <div className="space-y-8 relative">
       <Helmet>
-        <title>ড্যাশবোর্ড - অ্যাডমিন প্যানেল</title>
+        <title>{t('admin.dashboard')} - {t('admin.panel')}</title>
       </Helmet>
 
       {/* Notification */}
@@ -335,20 +338,20 @@ export default function Dashboard() {
                 <div className="p-3 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-full">
                   <AlertCircle size={32} />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white">নিশ্চিত করুন</h3>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t('admin.confirm')}</h3>
                 <p className="text-gray-600 dark:text-gray-400">{confirmModal.message}</p>
                 <div className="flex gap-3 w-full pt-2">
                   <button
                     onClick={closeConfirm}
                     className="flex-1 px-4 py-2.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-bold hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                   >
-                    না
+                    {t('admin.no')}
                   </button>
                   <button
                     onClick={confirmModal.onConfirm}
                     className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-colors shadow-lg shadow-red-600/20"
                   >
-                    হ্যাঁ, মুছুন
+                    {t('admin.yes_delete')}
                   </button>
                 </div>
               </div>
@@ -358,10 +361,10 @@ export default function Dashboard() {
       </AnimatePresence>
 
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">ড্যাশবোর্ড</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">{t('admin.dashboard')}</h1>
         <Link to="/admin/news/add" className="w-full sm:w-auto px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-md transition-colors font-medium flex items-center justify-center gap-2">
           <FileText size={18} />
-          নতুন সংবাদ
+          {t('admin.new_news')}
         </Link>
       </div>
 
@@ -369,10 +372,10 @@ export default function Dashboard() {
         <div className="bg-amber-50 dark:bg-amber-900/30 border-l-4 border-amber-500 p-4 rounded-xl flex items-start shadow-sm">
           <WifiOff className="text-amber-500 mr-3 mt-0.5 shrink-0" size={24} />
           <div>
-            <h3 className="text-amber-800 dark:text-amber-200 font-bold">Firebase কানেক্ট করা নেই!</h3>
+            <h3 className="text-amber-800 dark:text-amber-200 font-bold">{t('admin.firebase_not_connected')}</h3>
             <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
-              আপনার Vercel বা হোস্টিং এনভায়রনমেন্টে Firebase এর API Key গুলো সেট করা নেই। এর ফলে রিয়েল-টাইম ডেটাবেস কাজ করবে না। 
-              অনুগ্রহ করে Vercel Settings এ গিয়ে <code className="bg-amber-100 dark:bg-amber-800 px-1 rounded font-mono">VITE_FIREBASE_*</code> ভেরিয়েবলগুলো সেট করুন।
+              {t('admin.firebase_not_connected_desc')}
+              <code className="bg-amber-100 dark:bg-amber-800 px-1 rounded font-mono">VITE_FIREBASE_*</code> {t('admin.firebase_not_connected_desc2')}
             </p>
           </div>
         </div>
@@ -385,7 +388,7 @@ export default function Dashboard() {
             <FileText size={32} />
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">মোট সংবাদ</p>
+            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('admin.total_news')}</p>
             <h3 className="text-3xl font-bold text-gray-900 dark:text-white">{news.length}</h3>
           </div>
         </div>
@@ -394,7 +397,7 @@ export default function Dashboard() {
             <Eye size={32} />
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">মোট ভিউ</p>
+            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('admin.total_views')}</p>
             <h3 className="text-3xl font-bold text-gray-900 dark:text-white">{totalViews}</h3>
           </div>
         </div>
@@ -403,7 +406,7 @@ export default function Dashboard() {
             <TrendingUp size={32} />
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">ট্রেন্ডিং সংবাদ</p>
+            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('admin.trending_news')}</p>
             <h3 className="text-3xl font-bold text-gray-900 dark:text-white">{trendingCount}</h3>
           </div>
         </div>
@@ -415,18 +418,18 @@ export default function Dashboard() {
           <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-800/50">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
               <Clock size={20} className="text-gray-500" />
-              সাম্প্রতিক সংবাদ
+              {t('admin.recent_news')}
             </h2>
-            <Link to="/admin/news" className="text-sm text-red-600 hover:text-red-800 dark:text-red-400 font-medium">সব দেখুন</Link>
+            <Link to="/admin/news" className="text-sm text-red-600 hover:text-red-800 dark:text-red-400 font-medium">{t('admin.view_all')}</Link>
           </div>
           <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-gray-50 dark:bg-gray-800/80 text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">
-                  <th className="px-6 py-4 font-semibold">শিরোনাম</th>
-                  <th className="px-6 py-4 font-semibold">ক্যাটাগরি</th>
-                  <th className="px-6 py-4 font-semibold">প্রকাশকাল</th>
-                  <th className="px-6 py-4 font-semibold text-right">অ্যাকশন</th>
+                  <th className="px-6 py-4 font-semibold">{t('admin.table_title')}</th>
+                  <th className="px-6 py-4 font-semibold">{t('admin.table_category')}</th>
+                  <th className="px-6 py-4 font-semibold">{t('admin.table_date')}</th>
+                  <th className="px-6 py-4 font-semibold text-right">{t('admin.table_action')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
@@ -463,7 +466,7 @@ export default function Dashboard() {
                 {news.length === 0 && (
                   <tr>
                     <td colSpan={4} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
-                      কোনো সংবাদ পাওয়া যায়নি।
+                      {t('admin.no_news_found')}
                     </td>
                   </tr>
                 )}
@@ -486,21 +489,21 @@ export default function Dashboard() {
                 </div>
                 <div className="flex gap-2 pt-1">
                   <Link to={`/admin/news/edit/${article.id}`} className="flex-1 flex items-center justify-center gap-2 py-3 text-blue-600 bg-blue-50 dark:bg-blue-900/20 rounded-xl text-xs font-bold active:bg-blue-100 transition-colors">
-                    <Edit size={14} /> এডিট
+                    <Edit size={14} /> {t('admin.edit')}
                   </Link>
                   <button 
                     onClick={() => handleDelete(article.id)} 
                     disabled={deletingId === article.id}
                     className="flex-1 flex items-center justify-center gap-2 py-3 text-red-600 bg-red-50 dark:bg-red-900/20 rounded-xl text-xs font-bold active:bg-red-100 transition-colors disabled:opacity-50"
                   >
-                    <Trash2 size={14} /> {deletingId === article.id ? "মুছছে..." : "ডিলিট"}
+                    <Trash2 size={14} /> {deletingId === article.id ? t('admin.deleting') : t('admin.delete')}
                   </button>
                 </div>
               </div>
             ))}
             {news.length === 0 && (
               <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-                কোনো সংবাদ পাওয়া যায়নি।
+                {t('admin.no_news_found')}
               </div>
             )}
           </div>
@@ -511,7 +514,7 @@ export default function Dashboard() {
           <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
               <Megaphone size={20} className="text-gray-500" />
-              স্ক্রলিং শিরোনাম
+              {t('admin.scrolling_title')}
             </h2>
           </div>
           <div className="p-6 flex-1 flex flex-col">
@@ -520,7 +523,7 @@ export default function Dashboard() {
                 type="text"
                 value={newTickerText}
                 onChange={(e) => setNewTickerText(e.target.value)}
-                placeholder="নতুন শিরোনাম লিখুন..."
+                placeholder={t('admin.new_title_placeholder')}
                 className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
               />
               <button type="submit" disabled={!newTickerText.trim()} className="p-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors">
@@ -539,7 +542,7 @@ export default function Dashboard() {
                       onClick={() => handleToggleTicker(ticker.id, ticker.isActive)}
                       className={`text-xs px-2 py-1 rounded font-medium ${ticker.isActive ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400' : 'bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400'}`}
                     >
-                      {ticker.isActive ? 'বন্ধ করুন' : 'চালু করুন'}
+                      {ticker.isActive ? t('admin.turn_off') : t('admin.turn_on')}
                     </button>
                     <button 
                       onClick={() => handleDeleteTicker(ticker.id)}
@@ -551,7 +554,7 @@ export default function Dashboard() {
                 </div>
               ))}
               {tickers.length === 0 && (
-                <p className="text-center text-gray-500 dark:text-gray-400 py-4">কোনো শিরোনাম নেই।</p>
+                <p className="text-center text-gray-500 dark:text-gray-400 py-4">{t('admin.no_title')}</p>
               )}
             </div>
           </div>
@@ -564,7 +567,7 @@ export default function Dashboard() {
           <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
               <ImageIcon size={20} className="text-gray-500" />
-              বিজ্ঞাপন ব্যবস্থাপনা (হেডলাইনের নিচে)
+              {t('admin.ad_management')}
             </h2>
           </div>
           <div className="p-6 flex-1 flex flex-col">
@@ -573,21 +576,19 @@ export default function Dashboard() {
                 type="url"
                 value={newAdImageUrl}
                 onChange={(e) => setNewAdImageUrl(e.target.value)}
-                placeholder="ছবির URL (যেমন: https://example.com/ad.jpg)"
+                placeholder={t('admin.ad_image_url_placeholder')}
                 className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
-                required
               />
               <input
                 type="url"
                 value={newAdLinkUrl}
                 onChange={(e) => setNewAdLinkUrl(e.target.value)}
-                placeholder="লিংক URL (ক্লিক করলে যেখানে যাবে)"
+                placeholder={t('admin.ad_link_url_placeholder')}
                 className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
-                required
               />
               <button type="submit" disabled={!newAdImageUrl.trim() || !newAdLinkUrl.trim()} className="p-2 px-6 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors flex items-center gap-2 justify-center">
                 <PlusCircle size={20} />
-                যোগ করুন
+                {t('admin.add')}
               </button>
             </form>
 
@@ -606,7 +607,7 @@ export default function Dashboard() {
                         onClick={() => handleToggleAd(ad.id, ad.isActive)}
                         className={`text-xs px-2 py-1 rounded font-medium ${ad.isActive ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400' : 'bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400'}`}
                       >
-                        {ad.isActive ? 'বন্ধ করুন' : 'চালু করুন'}
+                        {ad.isActive ? t('admin.turn_off') : t('admin.turn_on')}
                       </button>
                       <button 
                         onClick={() => handleDeleteAd(ad.id)}
@@ -619,7 +620,7 @@ export default function Dashboard() {
                 </div>
               ))}
               {ads.length === 0 && (
-                <p className="text-center text-gray-500 dark:text-gray-400 py-4 col-span-full">কোনো বিজ্ঞাপন নেই।</p>
+                <p className="text-center text-gray-500 dark:text-gray-400 py-4 col-span-full">{t('admin.no_ad')}</p>
               )}
             </div>
           </div>
@@ -630,7 +631,7 @@ export default function Dashboard() {
           <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
               <Share2 size={20} className="text-gray-500" />
-              সোশ্যাল মিডিয়া লিংক
+              {t('admin.social_links')}
             </h2>
           </div>
           <div className="p-6 flex-1">
@@ -680,7 +681,7 @@ export default function Dashboard() {
                 disabled={savingSocial}
                 className="w-full py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-2 font-bold"
               >
-                {savingSocial ? "সংরক্ষণ হচ্ছে..." : <><Save size={20} /> সংরক্ষণ করুন</>}
+                {savingSocial ? t('admin.saving') : <><Save size={20} /> {t('admin.save')}</>}
               </button>
             </form>
           </div>
@@ -692,30 +693,30 @@ export default function Dashboard() {
         <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <Moon size={20} className="text-gray-500" />
-            রমজানের সময়সূচী ও আজান এলার্ট
+            {t('admin.ramadan_timer')}
           </h2>
         </div>
         <div className="p-6">
           <form onSubmit={handleUpdateRamadanTimer} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">সেহরির শেষ সময়</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('admin.sehri_time')}</label>
                 <input
                   type="text"
                   value={ramadanTimer.sehriTime}
                   onChange={(e) => setRamadanTimer({ ...ramadanTimer, sehriTime: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
-                  placeholder="যেমন: 04:45 AM"
+                  placeholder={t('admin.sehri_placeholder')}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">ইফতারের সময়</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('admin.iftar_time')}</label>
                 <input
                   type="text"
                   value={ramadanTimer.iftarTime}
                   onChange={(e) => setRamadanTimer({ ...ramadanTimer, iftarTime: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
-                  placeholder="যেমন: 06:15 PM"
+                  placeholder={t('admin.iftar_placeholder')}
                 />
               </div>
               <div className="flex items-end gap-2">
@@ -726,7 +727,7 @@ export default function Dashboard() {
                     onChange={(e) => setRamadanTimer({ ...ramadanTimer, isActive: e.target.checked })}
                     className="w-5 h-5 text-red-600 rounded focus:ring-red-500"
                   />
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">টাইমার ও এলার্ট চালু করুন</span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('admin.timer_alert_on')}</span>
                 </label>
                 <button
                   type="button"
@@ -741,13 +742,13 @@ export default function Dashboard() {
                         const audio = new Audio(`https://drive.google.com/uc?id=${idMatch[0]}`);
                         audioRef.current = audio;
                         audio.onended = () => setIsPlaying(false);
-                        audio.play().then(() => setIsPlaying(true)).catch(e => showNotification("অডিও প্লে করতে সমস্যা হয়েছে। ব্রাউজারে একবার ক্লিক করে আবার চেষ্টা করুন।", "error"));
+                        audio.play().then(() => setIsPlaying(true)).catch(e => showNotification(t('admin.audio_play_error'), "error"));
                       }
                     }
                   }}
                   className={`p-2 px-4 rounded-lg transition-colors text-sm font-bold ${isPlaying ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'} text-white`}
                 >
-                  {isPlaying ? "আজান বন্ধ করুন" : "আজান টেস্ট করুন"}
+                  {isPlaying ? t('admin.stop_azan') : t('admin.test_azan')}
                 </button>
               </div>
             </div>
@@ -756,7 +757,7 @@ export default function Dashboard() {
               disabled={savingRamadan}
               className="w-full py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-2 font-bold shadow-md"
             >
-              {savingRamadan ? "সংরক্ষণ হচ্ছে..." : <><Save size={20} /> সময়সূচী আপডেট করুন</>}
+              {savingRamadan ? t('admin.saving') : <><Save size={20} /> {t('admin.update_schedule')}</>}
             </button>
           </form>
         </div>
@@ -767,7 +768,7 @@ export default function Dashboard() {
         <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <Edit size={20} className="text-gray-500" />
-            পেজ কন্টেন্ট ব্যবস্থাপনা (About, Privacy, etc.)
+            {t('admin.page_content_management')}
           </h2>
         </div>
         <div className="p-6">
@@ -776,62 +777,62 @@ export default function Dashboard() {
               <div>
                 <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <Info size={16} className="text-blue-500" />
-                  আমাদের সম্পর্কে (About Us)
+                  {t('admin.about_us')}
                 </label>
                 <textarea
                   value={pageSettings.about}
                   onChange={(e) => setPageSettings({ ...pageSettings, about: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none h-32"
-                  placeholder="HTML কন্টেন্ট এখানে দিন..."
+                  placeholder={t('admin.html_content_placeholder')}
                 />
               </div>
               <div>
                 <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <Shield size={16} className="text-green-500" />
-                  গোপনীয়তা নীতি (Privacy Policy)
+                  {t('admin.privacy_policy')}
                 </label>
                 <textarea
                   value={pageSettings.privacy}
                   onChange={(e) => setPageSettings({ ...pageSettings, privacy: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none h-32"
-                  placeholder="HTML কন্টেন্ট এখানে দিন..."
+                  placeholder={t('admin.html_content_placeholder')}
                 />
               </div>
               <div>
                 <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <FileCheck size={16} className="text-emerald-500" />
-                  ব্যবহারের শর্তাবলী (Terms & Conditions)
+                  {t('admin.terms_conditions')}
                 </label>
                 <textarea
                   value={pageSettings.terms}
                   onChange={(e) => setPageSettings({ ...pageSettings, terms: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none h-32"
-                  placeholder="HTML কন্টেন্ট এখানে দিন..."
+                  placeholder={t('admin.html_content_placeholder')}
                 />
               </div>
               <div>
                 <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <Mail size={16} className="text-orange-500" />
-                  যোগাযোগ (Contact Us)
+                  {t('admin.contact_us')}
                 </label>
                 <textarea
                   value={pageSettings.contact}
                   onChange={(e) => setPageSettings({ ...pageSettings, contact: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none h-32"
-                  placeholder="HTML কন্টেন্ট এখানে দিন..."
+                  placeholder={t('admin.html_content_placeholder')}
                 />
               </div>
               <div className="md:col-span-2">
                 <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <CheckCircle size={16} className="text-purple-500" />
-                  কপিরাইট টেক্সট (Copyright Text)
+                  {t('admin.copyright_text')}
                 </label>
                 <input
                   type="text"
                   value={pageSettings.copyright || ""}
                   onChange={(e) => setPageSettings({ ...pageSettings, copyright: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
-                  placeholder="© 2026 দৈনিক বরগুনা। সর্বস্বত্ব সংরক্ষিত।"
+                  placeholder={t('admin.copyright_placeholder')}
                 />
               </div>
             </div>
@@ -840,7 +841,7 @@ export default function Dashboard() {
               disabled={savingPages}
               className="w-full py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-2 font-bold shadow-md"
             >
-              {savingPages ? "সংরক্ষণ হচ্ছে..." : <><Save size={20} /> পেজ সেটিংস সংরক্ষণ করুন</>}
+              {savingPages ? t('admin.saving') : <><Save size={20} /> {t('admin.save_page_settings')}</>}
             </button>
           </form>
         </div>

@@ -31,7 +31,7 @@ export default function UnionNews() {
   return (
     <div className="space-y-8">
       <Helmet>
-        <title>{getUnionTranslation(unionName || '')} - {t('nav.area_news')} | {t('nav.site_title')}</title>
+        <title>{getUnionTranslation(unionName || '')} - {t('news.area')} | {t('site.title')}</title>
       </Helmet>
 
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-200 dark:border-gray-800 pb-6">

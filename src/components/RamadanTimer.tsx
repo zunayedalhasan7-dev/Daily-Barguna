@@ -2,8 +2,10 @@ import React, { useEffect, useState, useRef } from "react";
 import { newsService, RamadanTimer as RamadanTimerType } from "../services/newsService";
 import { Moon, Sun, Clock, Volume2, VolumeX } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import { useLanguage } from "../context/LanguageContext";
 
 export default function RamadanTimer() {
+  const { t, language } = useLanguage();
   const [timer, setTimer] = useState<RamadanTimerType | null>(null);
   const [isAlertEnabled, setIsAlertEnabled] = useState(false);
   const [hasPlayed, setHasPlayed] = useState(false);
@@ -55,6 +57,15 @@ export default function RamadanTimer() {
     setHasPlayed(true); // Prevent auto-play from triggering again
   };
 
+  const formatTime = (timeStr: string) => {
+    if (language === 'en') return timeStr;
+    const bengaliDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+    let converted = timeStr.replace(/\d/g, (d) => bengaliDigits[parseInt(d)]);
+    converted = converted.replace('AM', 'ভোর');
+    converted = converted.replace('PM', 'সন্ধ্যা');
+    return converted;
+  };
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: -20 }}
@@ -71,14 +82,14 @@ export default function RamadanTimer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-12">
         <div className="flex items-center gap-2">
           <Moon className="text-emerald-600 dark:text-emerald-400" size={16} />
-          <span className="text-xs sm:text-sm font-medium text-emerald-800 dark:text-emerald-100">সেহরির শেষ সময়:</span>
-          <span className="text-base sm:text-lg font-bold font-serif">{timer.sehriTime}</span>
+          <span className="text-xs sm:text-sm font-medium text-emerald-800 dark:text-emerald-100">{t('ramadan.sehri_end')}:</span>
+          <span className="text-base sm:text-lg font-bold font-serif">{formatTime(timer.sehriTime)}</span>
         </div>
         <div className="hidden sm:block h-4 w-px bg-emerald-300 dark:bg-emerald-700"></div>
         <div className="flex items-center gap-2">
           <Sun className="text-orange-600 dark:text-orange-400" size={16} />
-          <span className="text-xs sm:text-sm font-medium text-emerald-800 dark:text-emerald-100">ইফতারের সময়:</span>
-          <span className="text-base sm:text-lg font-bold font-serif">{timer.iftarTime}</span>
+          <span className="text-xs sm:text-sm font-medium text-emerald-800 dark:text-emerald-100">{t('ramadan.iftar_time')}:</span>
+          <span className="text-base sm:text-lg font-bold font-serif">{formatTime(timer.iftarTime)}</span>
         </div>
         {isPlaying && (
           <button 
@@ -86,7 +97,7 @@ export default function RamadanTimer() {
             className="text-xs bg-red-600 dark:bg-red-800 text-white hover:bg-red-700 px-3 py-1 rounded-full transition-colors flex items-center gap-1"
           >
             <VolumeX size={14} />
-            আজান বন্ধ করুন
+            {t('ramadan.stop_azan')}
           </button>
         )}
         {!isAlertEnabled && (
@@ -104,7 +115,7 @@ export default function RamadanTimer() {
             className="text-xs bg-emerald-600 dark:bg-emerald-700 text-white hover:bg-emerald-700 dark:hover:bg-emerald-600 px-3 py-1 rounded-full transition-colors flex items-center gap-1"
           >
             <Volume2 size={14} />
-            ইফতার এলার্ট চালু করুন
+            {t('ramadan.enable_alert')}
           </button>
         )}
       </div>

@@ -5,7 +5,10 @@ import { Helmet } from "react-helmet-async";
 import { motion } from "motion/react";
 import { Lock, Mail, AlertCircle, ArrowLeft } from "lucide-react";
 
+import { useLanguage } from "../context/LanguageContext";
+
 export default function Login() {
+  const { t } = useLanguage();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -31,7 +34,7 @@ export default function Login() {
       await login(email, password);
       navigate(from, { replace: true });
     } catch (err: any) {
-      setError(err.message || "লগইন ব্যর্থ হয়েছে। ইমেইল বা পাসওয়ার্ড সঠিক নয়।");
+      setError(err.message || t('admin.login_failed'));
     } finally {
       setLoading(false);
     }
@@ -40,7 +43,7 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4 py-12 sm:px-6 lg:px-8 relative">
       <Helmet>
-        <title>অ্যাডমিন লগইন - দৈনিক বরগুনা</title>
+        <title>{t('admin.login_title')} - {t('site.title')}</title>
       </Helmet>
 
       <Link 
@@ -48,7 +51,7 @@ export default function Login() {
         className="absolute top-6 left-6 sm:top-10 sm:left-10 flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors font-medium text-sm sm:text-base bg-white dark:bg-gray-800 px-4 py-2 rounded-full shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md z-10"
       >
         <ArrowLeft size={18} />
-        <span>প্রচ্ছদে ফিরে যান</span>
+        <span>{t('admin.back_to_home')}</span>
       </Link>
       
       <motion.div 
@@ -59,10 +62,10 @@ export default function Login() {
       >
         <div>
           <h2 className="mt-2 text-center text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
-            Login
+            {t('admin.login')}
           </h2>
           <p className="mt-2 text-center text-xs sm:text-sm font-bold text-red-600 dark:text-red-400 uppercase tracking-wider">
-            Employee
+            {t('admin.employee')}
           </p>
         </div>
         
@@ -76,7 +79,7 @@ export default function Login() {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">ইমেইল ঠিকানা</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('admin.email_address')}</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Mail className="h-5 w-5 text-gray-400" />
@@ -92,7 +95,7 @@ export default function Login() {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">পাসওয়ার্ড</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('admin.password')}</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Lock className="h-5 w-5 text-gray-400" />
@@ -121,10 +124,10 @@ export default function Login() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  লগইন হচ্ছে...
+                  {t('admin.logging_in')}
                 </span>
               ) : (
-                "লগইন করুন"
+                t('admin.login')
               )}
             </button>
           </div>

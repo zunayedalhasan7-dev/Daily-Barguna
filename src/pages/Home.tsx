@@ -69,7 +69,6 @@ export default function Home() {
           <section>
             <div className="flex items-center justify-between mb-4 sm:mb-6 border-b-2 border-red-700 pb-2">
               <h2 className="text-xl sm:text-2xl font-bold font-serif text-gray-900 dark:text-white">{t('common.latest')}</h2>
-              <Link to="/latest" className="text-xs sm:text-sm text-red-700 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 font-medium">{t('common.read_more')} &rarr;</Link>
             </div>
             <div className="flex flex-col">
               {otherLatest.map(article => (

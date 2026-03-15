@@ -1,0 +1,20 @@
+{
+  "name": "Daily Barguna",
+  "short_name": "Barguna",
+  "theme_color": "#e11d48",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

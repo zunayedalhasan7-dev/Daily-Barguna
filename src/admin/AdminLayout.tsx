@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import { Outlet, Navigate, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
+import { useLanguage } from "../context/LanguageContext";
 import { LayoutDashboard, FileText, PlusCircle, LogOut, Sun, Moon, Home, Menu, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 
 export default function AdminLayout() {
+  const { t } = useLanguage();
   const { currentUser, loading, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
@@ -27,9 +29,9 @@ export default function AdminLayout() {
   }
 
   const navItems = [
-    { path: "/admin", icon: LayoutDashboard, label: "ড্যাশবোর্ড" },
-    { path: "/admin/news", icon: FileText, label: "সকল সংবাদ" },
-    { path: "/admin/news/add", icon: PlusCircle, label: "সংবাদ যোগ করুন" },
+    { path: "/admin", icon: LayoutDashboard, label: t('admin.dashboard') },
+    { path: "/admin/news", icon: FileText, label: t('admin.all_news') },
+    { path: "/admin/news/add", icon: PlusCircle, label: t('admin.add_news') },
   ];
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
@@ -40,7 +42,7 @@ export default function AdminLayout() {
       <header className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 z-30 flex items-center justify-between px-4 shadow-sm">
         <Link to="/" className="text-xl font-bold text-red-600 dark:text-red-500 flex items-center gap-2">
           <Home size={20} />
-          দৈনিক বরগুনা
+          {t('site.title')}
         </Link>
         <button onClick={toggleSidebar} className="p-2 text-gray-600 dark:text-gray-400">
           {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
@@ -69,9 +71,9 @@ export default function AdminLayout() {
         <div className="p-6 border-b border-gray-200 dark:border-gray-700">
           <Link to="/" className="text-2xl font-bold text-red-600 dark:text-red-500 tracking-tight flex items-center gap-2">
             <Home size={24} />
-            দৈনিক বরগুনা
+            {t('site.title')}
           </Link>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 uppercase tracking-wider font-semibold">অ্যাডমিন প্যানেল</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 uppercase tracking-wider font-semibold">{t('admin.panel')}</p>
         </div>
         
         <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
@@ -98,7 +100,7 @@ export default function AdminLayout() {
 
         <div className="p-4 border-t border-gray-200 dark:border-gray-700 space-y-4">
           <div className="flex items-center justify-between px-4 py-2 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-            <span className="text-sm font-medium text-gray-600 dark:text-gray-300">থিম পরিবর্তন</span>
+            <span className="text-sm font-medium text-gray-600 dark:text-gray-300">{t('admin.change_theme')}</span>
             <button onClick={toggleTheme} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
               {theme === "light" ? <Moon size={18} className="text-gray-600" /> : <Sun size={18} className="text-yellow-400" />}
             </button>
@@ -108,7 +110,7 @@ export default function AdminLayout() {
             className="w-full flex items-center justify-center space-x-2 px-4 py-2.5 bg-gray-100 dark:bg-gray-700 hover:bg-red-100 dark:hover:bg-red-900/30 text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 rounded-lg transition-colors font-medium"
           >
             <LogOut size={18} />
-            <span>লগআউট</span>
+            <span>{t('admin.logout')}</span>
           </button>
         </div>
       </aside>

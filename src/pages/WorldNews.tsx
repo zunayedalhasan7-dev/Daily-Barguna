@@ -3,8 +3,10 @@ import { Helmet } from "react-helmet-async";
 import { newsService, NewsArticle } from "../services/newsService";
 import NewsSlider from "../components/NewsSlider";
 import { Link } from "react-router-dom";
+import { useLanguage } from "../context/LanguageContext";
 
 export default function WorldNews() {
+  const { t, getCategoryTranslation } = useLanguage();
   const [worldNews, setWorldNews] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -23,7 +25,7 @@ export default function WorldNews() {
   }, []);
 
   if (loading) {
-    return <div className="p-8 text-center">লোড হচ্ছে...</div>;
+    return <div className="p-8 text-center">{t('common.loading')}</div>;
   }
 
   const featured = worldNews.slice(0, 5);
@@ -32,11 +34,11 @@ export default function WorldNews() {
   return (
     <div className="container mx-auto px-4 py-8">
       <Helmet>
-        <title>বিশ্ব সংবাদ – দৈনিক বরগুনা</title>
-        <meta name="description" content="সর্বশেষ আন্তর্জাতিক ও বিশ্ব সংবাদ, ব্রেকিং নিউজ এবং ট্রেন্ডিং খবর দৈনিক বরগুনায়।" />
+        <title>{getCategoryTranslation('বিশ্ব')} - {t('site.title')}</title>
+        <meta name="description" content={t('world_news.description')} />
       </Helmet>
 
-      <h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-white">বিশ্ব সংবাদ</h1>
+      <h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-white">{getCategoryTranslation('বিশ্ব')}</h1>
 
       {featured.length > 0 && <NewsSlider news={featured} />}
 

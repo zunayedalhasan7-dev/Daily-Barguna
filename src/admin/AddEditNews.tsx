@@ -3,11 +3,13 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { newsService, NewsArticle, CATEGORIES, SEARCHABLE_UNIONS, DISTRICTS } from "../services/newsService";
 import { Save, X, Image as ImageIcon, Video, Calendar, User, Tag, CheckCircle, Edit, PlusCircle, AlertCircle, Eye, Search, MapPin, Link as LinkIcon, FileText } from "lucide-react";
+import { useLanguage } from "../context/LanguageContext";
 
 export default function AddEditNews() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const isEdit = !!id;
+  const { t, getCategoryTranslation } = useLanguage();
 
   const [formData, setFormData] = useState<Partial<NewsArticle>>({
     title: "",
@@ -45,10 +47,10 @@ export default function AddEditNews() {
             setKeywordsInput(data.keywords?.join(", ") || "");
             setUnionSearch(data.union || "");
           } else {
-            setError("সংবাদটি পাওয়া যায়নি।");
+            setError(t('admin.news_not_found'));
           }
         } catch (err) {
-          setError("সংবাদ লোড করতে সমস্যা হয়েছে।");
+          setError(t('admin.news_load_error'));
         } finally {
           setLoading(false);
         }
@@ -129,7 +131,7 @@ export default function AddEditNews() {
       navigate("/admin");
     } catch (err) {
       console.error("Error in handleSubmit:", err);
-      setError(`সংবাদ সংরক্ষণ করতে সমস্যা হয়েছে: ${err instanceof Error ? err.message : String(err)}`);
+      setError(`${t('admin.news_save_error')} ${err instanceof Error ? err.message : String(err)}`);
     } finally {
       setLoading(false);
     }
@@ -150,13 +152,13 @@ export default function AddEditNews() {
   return (
     <div className="max-w-4xl mx-auto space-y-8 relative">
       <Helmet>
-        <title>{isEdit ? "সংবাদ সম্পাদনা" : "নতুন সংবাদ"} - অ্যাডমিন প্যানেল</title>
+        <title>{isEdit ? t('admin.edit_news') : t('admin.new_news')} - {t('admin.panel')}</title>
       </Helmet>
 
       <div className="flex justify-between items-center pb-4 border-b border-gray-200 dark:border-gray-700">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
           {isEdit ? <Edit size={28} className="text-blue-600" /> : <PlusCircle size={28} className="text-green-600" />}
-          {isEdit ? "সংবাদ সম্পাদনা" : "নতুন সংবাদ যোগ করুন"}
+          {isEdit ? t('admin.edit_news') : t('admin.add_new_news')}
         </h1>
         <button onClick={() => navigate(-1)} className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
           <X size={24} />
@@ -175,7 +177,7 @@ export default function AddEditNews() {
         {/* Basic Info */}
         <div className="space-y-6">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">শিরোনাম <span className="text-red-500">*</span></label>
+            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t('admin.title')} <span className="text-red-500">*</span></label>
             <input
               type="text"
               name="title"
@@ -183,12 +185,12 @@ export default function AddEditNews() {
               value={formData.title}
               onChange={handleChange}
               className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white text-lg font-medium transition-colors"
-              placeholder="সংবাদের শিরোনাম লিখুন"
+              placeholder={t('admin.title_placeholder')}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">সংক্ষিপ্ত বিবরণ <span className="text-red-500">*</span></label>
+            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t('admin.short_description')} <span className="text-red-500">*</span></label>
             <textarea
               name="description"
               required
@@ -196,12 +198,12 @@ export default function AddEditNews() {
               value={formData.description}
               onChange={handleChange}
               className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white transition-colors resize-none"
-              placeholder="সংবাদের সংক্ষিপ্ত সারমর্ম (হোমপেজে দেখানোর জন্য)"
+              placeholder={t('admin.short_description_placeholder')}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">মূল সংবাদ (HTML সমর্থিত) <span className="text-red-500">*</span></label>
+            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{t('admin.main_news')} <span className="text-red-500">*</span></label>
             <textarea
               name="content"
               required
@@ -209,7 +211,7 @@ export default function AddEditNews() {
               value={formData.content}
               onChange={handleChange}
               className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white font-mono text-sm transition-colors"
-              placeholder="<p>বিস্তারিত সংবাদ এখানে লিখুন...</p>"
+              placeholder={t('admin.main_news_placeholder')}
             />
           </div>
         </div>
@@ -220,10 +222,10 @@ export default function AddEditNews() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="space-y-6">
             <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2 border-b border-gray-200 dark:border-gray-700 pb-2">
-              <ImageIcon size={20} className="text-blue-500" /> মিডিয়া
+              <ImageIcon size={20} className="text-blue-500" /> {t('admin.media')}
             </h3>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">ছবির URL <span className="text-red-500">*</span></label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('admin.image_url')} <span className="text-red-500">*</span></label>
               <input
                 type="url"
                 name="imageUrl"
@@ -237,28 +239,28 @@ export default function AddEditNews() {
                 <div className="mt-3 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 aspect-video relative group">
                   <img src={formData.imageUrl} alt="Preview" className="w-full h-full object-cover" />
                   <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <span className="text-white text-sm font-medium">প্রিভিউ</span>
+                    <span className="text-white text-sm font-medium">{t('admin.preview')}</span>
                   </div>
                 </div>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">অতিরিক্ত ছবি (লিংক ও ক্যাপশন)</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('admin.additional_images')}</label>
               <div className="flex flex-col gap-2">
                 <input
                   type="url"
                   value={additionalImageUrl}
                   onChange={(e) => setAdditionalImageUrl(e.target.value)}
                   className="flex-1 px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
-                  placeholder="ছবির লিংক দিন"
+                  placeholder={t('admin.image_link_placeholder')}
                 />
                 <input
                   type="text"
                   value={additionalImageCaption}
                   onChange={(e) => setAdditionalImageCaption(e.target.value)}
                   className="flex-1 px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
-                  placeholder="ছবির ক্যাপশন দিন"
+                  placeholder={t('admin.image_caption_placeholder')}
                 />
                 <button
                   type="button"
@@ -267,7 +269,7 @@ export default function AddEditNews() {
                   className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   <PlusCircle size={18} />
-                  যোগ করুন
+                  {t('admin.add')}
                 </button>
               </div>
               
@@ -292,7 +294,7 @@ export default function AddEditNews() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
-                <Video size={16} className="text-gray-500" /> ভিডিও URL (ঐচ্ছিক)
+                <Video size={16} className="text-gray-500" /> {t('admin.video_url')}
               </label>
               <input
                 type="url"
@@ -300,7 +302,7 @@ export default function AddEditNews() {
                 value={formData.videoUrl || ""}
                 onChange={handleChange}
                 className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
-                placeholder="YouTube URL অথবা .mp4/.webm লিংক"
+                placeholder={t('admin.video_url_placeholder')}
               />
               {formData.videoUrl && (
                 <div className="mt-3 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 aspect-video relative group bg-black">
@@ -318,7 +320,7 @@ export default function AddEditNews() {
                     />
                   )}
                   <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                    <span className="text-white text-sm font-medium">ভিডিও প্রিভিউ</span>
+                    <span className="text-white text-sm font-medium">{t('admin.video_preview')}</span>
                   </div>
                 </div>
               )}
@@ -327,11 +329,11 @@ export default function AddEditNews() {
 
           <div className="space-y-6">
             <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2 border-b border-gray-200 dark:border-gray-700 pb-2">
-              <Tag size={20} className="text-green-500" /> মেটাডেটা
+              <Tag size={20} className="text-green-500" /> {t('admin.metadata')}
             </h3>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
-                <FileText size={16} className="text-gray-500" /> ফাইল লিংক (যেমন: Google Docs)
+                <FileText size={16} className="text-gray-500" /> {t('admin.file_link')}
               </label>
               <input
                 type="url"
@@ -339,12 +341,12 @@ export default function AddEditNews() {
                 value={formData.fileUrl || ""}
                 onChange={handleChange}
                 className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
-                placeholder="https://docs.google.com/..."
+                placeholder={t('admin.file_link_placeholder')}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">ক্যাটাগরি <span className="text-red-500">*</span></label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('admin.category')} <span className="text-red-500">*</span></label>
               <select
                 name="category"
                 required
@@ -353,29 +355,29 @@ export default function AddEditNews() {
                 className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
               >
                 {CATEGORIES.map(cat => (
-                  <option key={cat} value={cat}>{cat}</option>
+                  <option key={cat} value={cat}>{getCategoryTranslation(cat)}</option>
                 ))}
               </select>
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">জেলা (ঐচ্ছিক)</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('admin.district')}</label>
               <select
                 name="district"
                 value={formData.district || ""}
                 onChange={handleChange}
                 className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
               >
-                <option value="">জেলা নির্বাচন করুন</option>
+                <option value="">{t('admin.select_district')}</option>
                 {DISTRICTS.map(dist => (
-                  <option key={dist} value={dist}>{dist}</option>
+                  <option key={dist} value={dist}>{t(`district.${dist}`)}</option>
                 ))}
               </select>
             </div>
 
             <div className="relative">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
-                <MapPin size={16} className="text-gray-500" /> এলাকা/ইউনিয়ন (ঐচ্ছিক)
+                <MapPin size={16} className="text-gray-500" /> {t('admin.union_area')}
               </label>
               <div className="relative">
                 <input
@@ -386,7 +388,7 @@ export default function AddEditNews() {
                     setShowUnionDropdown(true);
                   }}
                   onFocus={() => setShowUnionDropdown(true)}
-                  placeholder="ইউনিয়ন খুঁজুন..."
+                  placeholder={t('admin.search_union_placeholder')}
                   className="w-full px-4 py-2.5 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
                 />
                 <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -418,11 +420,11 @@ export default function AddEditNews() {
                         }}
                         className={`w-full text-left px-4 py-2 hover:bg-red-50 dark:hover:bg-gray-700 transition-colors ${formData.union === u.name ? 'bg-red-50 dark:bg-gray-700 text-red-700 dark:text-red-400 font-bold' : 'text-gray-700 dark:text-gray-300'}`}
                       >
-                        {u.name}
+                        {t(`union.${u.name}`)}
                       </button>
                     ))
                   ) : (
-                    <div className="px-4 py-2 text-sm text-gray-500 italic">কোন ইউনিয়ন পাওয়া যায়নি</div>
+                    <div className="px-4 py-2 text-sm text-gray-500 italic">{t('admin.no_union_found')}</div>
                   )}
                 </div>
               )}
@@ -430,7 +432,7 @@ export default function AddEditNews() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
-                <User size={16} className="text-gray-500" /> প্রতিবেদক <span className="text-red-500">*</span>
+                <User size={16} className="text-gray-500" /> {t('admin.reporter')} <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -443,14 +445,14 @@ export default function AddEditNews() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
-                <Tag size={16} className="text-gray-500" /> কীবোর্ড (কমা দিয়ে আলাদা করুন)
+                <Tag size={16} className="text-gray-500" /> {t('admin.keywords')}
               </label>
               <input
                 type="text"
                 value={keywordsInput}
                 onChange={handleKeywordsChange}
                 className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
-                placeholder="যেমন: বরগুনা, স্বাস্থ্য, হাসপাতাল"
+                placeholder={t('admin.keywords_placeholder')}
               />
             </div>
             <div className="pt-4">
@@ -468,8 +470,8 @@ export default function AddEditNews() {
                   </div>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-sm font-bold text-gray-900 dark:text-white group-hover:text-red-700 dark:group-hover:text-red-400 transition-colors">ট্রেন্ডিং সংবাদ হিসেবে চিহ্নিত করুন</span>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">এই সংবাদটি হোমপেজের ট্রেন্ডিং সেকশনে প্রদর্শিত হবে।</span>
+                  <span className="text-sm font-bold text-gray-900 dark:text-white group-hover:text-red-700 dark:group-hover:text-red-400 transition-colors">{t('admin.mark_as_trending')}</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">{t('admin.trending_description')}</span>
                 </div>
               </label>
             </div>
@@ -483,14 +485,14 @@ export default function AddEditNews() {
             className="flex items-center space-x-2 px-6 py-2.5 border border-blue-300 dark:border-blue-600 text-blue-700 dark:text-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors font-medium"
           >
             <Eye size={18} />
-            <span>প্রিভিউ</span>
+            <span>{t('admin.preview')}</span>
           </button>
           <button
             type="button"
             onClick={() => navigate(-1)}
             className="px-6 py-2.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium"
           >
-            বাতিল
+            {t('admin.cancel')}
           </button>
           <button
             type="submit"
@@ -498,7 +500,7 @@ export default function AddEditNews() {
             className="flex items-center space-x-2 px-8 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all disabled:opacity-50 font-medium"
           >
             <Save size={18} />
-            <span>{loading ? "সংরক্ষণ হচ্ছে..." : "সংরক্ষণ করুন"}</span>
+            <span>{loading ? t('admin.saving') : t('admin.save')}</span>
           </button>
         </div>
       </form>
@@ -509,7 +511,7 @@ export default function AddEditNews() {
           <div className="bg-white dark:bg-gray-900 w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl flex flex-col">
             <div className="sticky top-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 p-4 flex justify-between items-center z-10">
               <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                <Eye size={20} className="text-blue-500" /> প্রিভিউ
+                <Eye size={20} className="text-blue-500" /> {t('admin.preview')}
               </h2>
               <button onClick={() => setShowPreview(false)} className="p-2 text-gray-500 hover:text-red-500 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
                 <X size={24} />
@@ -519,10 +521,10 @@ export default function AddEditNews() {
               <article className="max-w-3xl mx-auto">
                 <header className="mb-8">
                   <div className="text-sm text-red-600 dark:text-red-400 font-bold uppercase tracking-wider mb-4">
-                    {formData.category}
+                    {formData.category ? getCategoryTranslation(formData.category) : ''}
                   </div>
                   <h1 className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white leading-tight mb-6">
-                    {formData.title || "শিরোনাম এখানে প্রদর্শিত হবে"}
+                    {formData.title || t('admin.title_placeholder')}
                   </h1>
                   <div className="flex items-center space-x-6 text-sm text-gray-600 dark:text-gray-400 py-4 border-y border-gray-200 dark:border-gray-700">
                     <div className="flex items-center space-x-2">
@@ -555,14 +557,14 @@ export default function AddEditNews() {
                     <img src={formData.imageUrl} alt="Preview" className="w-full h-auto object-cover max-h-[600px]" />
                   ) : (
                     <div className="w-full aspect-video bg-gray-200 dark:bg-gray-800 flex items-center justify-center text-gray-500">
-                      ছবি বা ভিডিও যুক্ত করা হয়নি
+                      {t('admin.no_image_video')}
                     </div>
                   )}
                 </figure>
 
                 <div 
                   className="prose prose-lg dark:prose-invert max-w-none font-serif text-gray-800 dark:text-gray-200 leading-relaxed"
-                  dangerouslySetInnerHTML={{ __html: formData.content || "<p>বিস্তারিত সংবাদ এখানে প্রদর্শিত হবে...</p>" }}
+                  dangerouslySetInnerHTML={{ __html: formData.content || `<p>${t('admin.main_news_placeholder')}</p>` }}
                 />
               </article>
             </div>

@@ -101,7 +101,7 @@ export default function Layout() {
       <div className="bg-gray-100 dark:bg-[#1a1a1a] text-gray-600 dark:text-gray-300 py-1 text-[10px] sm:text-xs border-b border-gray-200 dark:border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-8 sm:h-10">
           <div className="flex items-center gap-2 sm:gap-4 overflow-hidden">
-            <div className="flex items-center gap-2 font-medium">
+            <div className="hidden sm:flex items-center gap-2 font-medium">
               <span className="whitespace-nowrap hidden xs:inline">{gregorianDate}</span>
               <span className="text-gray-600 hidden xs:inline">|</span>
               <span className="whitespace-nowrap hidden sm:inline">{currentTime.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
@@ -143,13 +143,7 @@ export default function Layout() {
                   </svg>
                 </a>
                 <a href={socialLinks.youtube} target="_blank" rel="noopener noreferrer" className="hover:text-red-700 dark:hover:text-white transition-colors"><Youtube size={14} /></a>
-                <button 
-                  onClick={toggleTheme}
-                  className="p-1 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-full transition-colors"
-                  aria-label="Toggle Theme"
-                >
-                  {theme === "dark" ? <Sun size={14} /> : <Moon size={14} />}
-                </button>
+                <a href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" className="hover:text-red-700 dark:hover:text-white transition-colors"><Instagram size={14} /></a>
               </div>
             </div>
           </div>
