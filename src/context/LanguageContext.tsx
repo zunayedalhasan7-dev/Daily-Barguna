@@ -424,8 +424,6 @@ const translations: Record<Language, Record<string, string>> = {
     'admin.add_news': 'সংবাদ যোগ করুন',
     'admin.edit_news': 'সংবাদ এডিট করুন',
     'admin.settings': 'সেটিংস',
-    'admin.delete': 'ডিলিট',
-    'admin.save': 'সংরক্ষণ করুন',
     'admin.cancel': 'বাতিল',
   },
   en: {
@@ -719,8 +717,6 @@ const translations: Record<Language, Record<string, string>> = {
     'admin.add_news': 'Add News',
     'admin.edit_news': 'Edit News',
     'admin.settings': 'Settings',
-    'admin.delete': 'Delete',
-    'admin.save': 'Save',
     'admin.cancel': 'Cancel',
   }
 };

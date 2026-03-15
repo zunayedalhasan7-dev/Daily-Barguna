@@ -7,6 +7,8 @@ import { CATEGORIES, newsService, Ad, SocialLinks } from "../services/newsServic
 import HeadlineTicker from "./HeadlineTicker";
 import LiveBanner from "./LiveBanner";
 import RamadanTimer from "./RamadanTimer";
+import BBCLogo from "./BBCLogo";
+import StickyHeader from "./StickyHeader";
 import { AnimatePresence, motion } from "motion/react";
 
 export default function Layout() {
@@ -157,28 +159,16 @@ export default function Layout() {
       <LiveBanner />
 
       {/* Header */}
-      <header className="bg-white dark:bg-gray-900 sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16 sm:h-20">
-            
-            {/* Logo */}
-            <div className="flex-shrink-0 flex items-center">
-              <Link to="/" className="flex items-center gap-1.5 sm:gap-2 group">
-                <div className="bg-red-700 text-white p-1.5 sm:p-2 rounded-sm flex-shrink-0">
-                  <span className="font-serif font-black text-xl sm:text-2xl leading-none">দ</span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="font-serif font-black text-xl sm:text-3xl tracking-tight text-gray-900 dark:text-white leading-none">
-                    দৈনিক <span className="text-red-700">বরগুনা</span>
-                  </span>
-                  <span className="text-[8px] sm:text-[10px] uppercase tracking-[0.1em] sm:tracking-[0.2em] text-gray-500 dark:text-gray-400 font-bold mt-0.5 sm:mt-1">
-                    সত্যের সন্ধানে অবিরাম
-                  </span>
-                </div>
-              </Link>
-            </div>
+      <StickyHeader>
+        {() => (
+          <>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="flex justify-between items-center h-16 sm:h-20">
+                
+                {/* Logo */}
+                <BBCLogo />
 
-            {/* Desktop Navigation */}
+                {/* Desktop Navigation */}
             <nav className="hidden md:flex space-x-1">
               <Link to="/" className="px-3 py-2 text-sm font-bold text-gray-900 dark:text-gray-100 hover:text-red-700 dark:hover:text-red-400 transition-colors">
                 {t('nav.home')}
@@ -312,7 +302,9 @@ export default function Layout() {
             </div>
           </div>
         )}
-      </header>
+        </>
+      )}
+    </StickyHeader>
 
       {/* Headline Ticker */}
       <HeadlineTicker />
