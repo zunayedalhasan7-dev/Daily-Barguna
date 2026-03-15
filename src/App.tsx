@@ -4,7 +4,7 @@ import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import { LanguageProvider } from "./context/LanguageContext";
-import ScrollToTop from "./components/ScrollToTop";
+import { SmoothScrollProvider } from "./components/SmoothScrollProvider";
 import ErrorBoundary from "./components/ErrorBoundary";
 import RamadanAzanPlayer from "./components/RamadanAzanPlayer";
 
@@ -41,9 +41,9 @@ export default function App() {
           <ThemeProvider>
             <AuthProvider>
               <Router>
-                <ScrollToTop />
-                <Routes>
-                  {/* Public Routes */}
+                <SmoothScrollProvider>
+                  <Routes>
+                    {/* Public Routes */}
                   <Route path="/" element={<Layout />}>
                     <Route index element={<Home />} />
                     <Route path="category/:category" element={<Category />} />
@@ -71,6 +71,7 @@ export default function App() {
                     <Route path="news/edit/:id" element={<AddEditNews />} />
                   </Route>
                 </Routes>
+                </SmoothScrollProvider>
               </Router>
             </AuthProvider>
           </ThemeProvider>
