@@ -38,20 +38,31 @@ export default class ErrorBoundary extends Component<Props, State> {
               <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
             </div>
             <LanguageContext.Consumer>
-              {({ t }) => (
-                <>
-                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('error.title')}</h1>
-                  <p className="text-gray-600 dark:text-gray-400 mb-8">
-                    {t('error.message')}
-                  </p>
-                  <button
-                    onClick={() => window.location.reload()}
-                    className="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl transition-colors shadow-lg shadow-red-600/20"
-                  >
-                    {t('error.refresh')}
-                  </button>
-                </>
-              )}
+              {(context) => {
+                const t = context?.t || ((key: string) => {
+                  const fallbacks: Record<string, string> = {
+                    'error.title': 'Something went wrong',
+                    'error.message': 'An unexpected error occurred. Please try refreshing the page.',
+                    'error.refresh': 'Refresh Page'
+                  };
+                  return fallbacks[key] || key;
+                });
+
+                return (
+                  <>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{t('error.title')}</h1>
+                    <p className="text-gray-600 dark:text-gray-400 mb-8">
+                      {t('error.message')}
+                    </p>
+                    <button
+                      onClick={() => window.location.reload()}
+                      className="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl transition-colors shadow-lg shadow-red-600/20"
+                    >
+                      {t('error.refresh')}
+                    </button>
+                  </>
+                );
+              }}
             </LanguageContext.Consumer>
             {process.env.NODE_ENV === 'development' && this.state.error && (
               <div className="mt-8 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg text-left overflow-auto max-h-40">

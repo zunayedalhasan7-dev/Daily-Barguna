@@ -34,6 +34,36 @@
   </head>
   <body>
     <div id="root"></div>
+    <div id="app-error" style="display:none; position:fixed; inset:0; align-items:center; justify-content:center; background:#f9fafb; padding:20px; text-align:center; font-family:sans-serif; z-index:9999;">
+      <div style="max-width:400px; width:100%; background:white; padding:40px; border-radius:16px; box-shadow:0 10px 25px -5px rgba(0,0,0,0.1);">
+        <div style="width:64px; height:64px; background:#fee2e2; color:#ef4444; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 24px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+        </div>
+        <h1 style="font-size:24px; font-weight:bold; color:#111827; margin-bottom:12px;">App failed to load</h1>
+        <p style="color:#4b5563; margin-bottom:24px;">The application is taking too long to respond. This might be due to a connection issue or high server load (Rate Limit).</p>
+        <button onclick="window.location.reload()" style="width:100%; padding:12px; background:#e11d48; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer; transition:background 0.2s;" onmouseover="this.style.background='#be123c'" onmouseout="this.style.background='#e11d48'">Refresh Page</button>
+      </div>
+    </div>
+    <script>
+      // Show error if app doesn't load within 12 seconds
+      window.appLoadTimeout = setTimeout(function() {
+        var root = document.getElementById('root');
+        if (root && (root.innerHTML === '' || root.innerHTML.length < 100)) {
+          document.getElementById('app-error').style.display = 'flex';
+        }
+      }, 12000);
+      
+      // Clear timeout if app loads
+      var observer = new MutationObserver(function(mutations) {
+        var root = document.getElementById('root');
+        if (root && root.innerHTML.length > 100) {
+          clearTimeout(window.appLoadTimeout);
+          document.getElementById('app-error').style.display = 'none';
+          observer.disconnect();
+        }
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -157,6 +157,26 @@ export default function Search() {
           </h1>
         </div>
         
+        <form onSubmit={(e) => {
+          e.preventDefault();
+          const formData = new FormData(e.currentTarget);
+          const newQuery = formData.get("q") as string;
+          if (newQuery.trim()) {
+            setSearchParams({ q: newQuery.trim() });
+          }
+        }} className="relative flex-grow md:flex-grow-0 md:w-64">
+          <input
+            type="text"
+            name="q"
+            defaultValue={query}
+            placeholder={t('nav.search_placeholder')}
+            className="w-full pl-4 pr-10 py-2 border border-gray-300 dark:border-gray-700 rounded-full bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:border-red-600 dark:focus:border-red-500"
+          />
+          <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-red-600">
+            <SearchIcon size={18} />
+          </button>
+        </form>
+
         <button 
           onClick={() => setShowFilters(!showFilters)}
           className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold text-sm transition-all ${

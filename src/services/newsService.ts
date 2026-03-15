@@ -180,8 +180,27 @@ export interface SearchFilters {
   union?: string;
 }
 
+// Cache object
+const cache: Record<string, { data: any; timestamp: number }> = {};
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+const getCached = (key: string) => {
+  const cached = cache[key];
+  if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+    return cached.data;
+  }
+  return null;
+};
+
+const setCached = (key: string, data: any) => {
+  cache[key] = { data, timestamp: Date.now() };
+};
+
 export const newsService = {
   async getAllNews(): Promise<NewsArticle[]> {
+    const cached = getCached("allNews");
+    if (cached) return cached;
+
     if (db) {
       try {
         const q = query(collection(db, "news"));
@@ -195,7 +214,9 @@ export const newsService = {
             author: data.author === "xpeee01@gmail.com" ? "Admin" : data.author
           } as NewsArticle;
         });
-        return news.sort(sortNewsByTrendingAndDate);
+        const sorted = news.sort(sortNewsByTrendingAndDate);
+        setCached("allNews", sorted);
+        return sorted;
       } catch (error) {
         console.warn("Firestore error in getAllNews, falling back to mock data:", error);
       }
@@ -224,9 +245,11 @@ export const newsService = {
   },
 
   async getTrendingNews(): Promise<NewsArticle[]> {
+    const cached = getCached("trendingNews");
+    if (cached) return cached;
+
     if (db) {
       try {
-        // Removed orderBy to avoid requiring a composite index
         const q = query(collection(db, "news"), where("trending", "==", true));
         const snapshot = await getDocs(q);
         const news = snapshot.docs.map(doc => {
@@ -237,7 +260,9 @@ export const newsService = {
             author: data.author === "xpeee01@gmail.com" ? "Admin" : data.author
           } as NewsArticle;
         });
-        return news.sort(sortNewsByTrendingAndDate).slice(0, 5);
+        const sorted = news.sort(sortNewsByTrendingAndDate).slice(0, 5);
+        setCached("trendingNews", sorted);
+        return sorted;
       } catch (error) {
         console.warn("Firestore error in getTrendingNews, falling back to mock data:", error);
       }
@@ -246,9 +271,11 @@ export const newsService = {
   },
 
   async getNewsByCategory(category: string): Promise<NewsArticle[]> {
+    const cached = getCached(`newsByCategory_${category}`);
+    if (cached) return cached;
+
     if (db) {
       try {
-        // Removed orderBy to avoid requiring a composite index
         const q = query(collection(db, "news"), where("category", "==", category));
         const snapshot = await getDocs(q);
         const news = snapshot.docs.map(doc => {
@@ -259,7 +286,9 @@ export const newsService = {
             author: data.author === "xpeee01@gmail.com" ? "Admin" : data.author
           } as NewsArticle;
         });
-        return news.sort(sortNewsByTrendingAndDate);
+        const sorted = news.sort(sortNewsByTrendingAndDate);
+        setCached(`newsByCategory_${category}`, sorted);
+        return sorted;
       } catch (error) {
         console.warn("Firestore error in getNewsByCategory, falling back to mock data:", error);
       }
@@ -268,6 +297,9 @@ export const newsService = {
   },
 
   async getNewsByUnion(union: string): Promise<NewsArticle[]> {
+    const cached = getCached(`newsByUnion_${union}`);
+    if (cached) return cached;
+
     if (db) {
       try {
         const q = query(collection(db, "news"), where("union", "==", union));
@@ -280,7 +312,9 @@ export const newsService = {
             author: data.author === "xpeee01@gmail.com" ? "Admin" : data.author
           } as NewsArticle;
         });
-        return news.sort(sortNewsByTrendingAndDate);
+        const sorted = news.sort(sortNewsByTrendingAndDate);
+        setCached(`newsByUnion_${union}`, sorted);
+        return sorted;
       } catch (error) {
         console.warn("Firestore error in getNewsByUnion, falling back to mock data:", error);
       }
@@ -310,22 +344,48 @@ export const newsService = {
     return mockNews.find(n => n.id === id) || null;
   },
 
+  async transliterateToBengali(text: string): Promise<string> {
+    const apiKey = process.env.GEMINI_API_KEY || import.meta.env.GEMINI_API_KEY || import.meta.env.VITE_GEMINI_API_KEY;
+    if (!apiKey || apiKey === "TODO_KEYHERE") return text;
+    
+    try {
+      const ai = new GoogleGenAI({ apiKey });
+      const response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: `Transliterate the following Banglish (Bengali in English script) text to Bengali script. Return only the Bengali text: "${text}"`,
+      });
+      return response.text?.trim() || text;
+    } catch (error: any) {
+      // Silently catch all Gemini errors to prevent UI disruption
+      return text;
+    }
+  },
+
   async searchNews(filters: SearchFilters | string): Promise<NewsArticle[]> {
     const allNews = await this.getAllNews();
     
     // Handle legacy string query
     const searchFilters: SearchFilters = typeof filters === 'string' ? { query: filters } : filters;
     
+    let queryTerms: string[] = [];
+    if (searchFilters.query?.trim()) {
+      const originalQuery = searchFilters.query.trim();
+      const bengaliQuery = await this.transliterateToBengali(originalQuery);
+      
+      // Combine original and transliterated terms
+      const combinedQuery = `${originalQuery} ${bengaliQuery}`;
+      queryTerms = combinedQuery.toLowerCase().split(/\s+/).filter(t => t.length > 0);
+    }
+
     return allNews.filter(n => {
       // Query filter
-      if (searchFilters.query?.trim()) {
-        const searchTerms = searchFilters.query.toLowerCase().split(/\s+/).filter(t => t.length > 0);
+      if (queryTerms.length > 0) {
         const titleLower = n.title.toLowerCase();
         const descLower = n.description.toLowerCase();
         const contentLower = n.content.toLowerCase();
         const keywordsLower = n.keywords?.map(k => k.toLowerCase()) || [];
         
-        const matchesQuery = searchTerms.some(term => 
+        const matchesQuery = queryTerms.some(term => 
           titleLower.includes(term) || 
           descLower.includes(term) || 
           contentLower.includes(term) ||
@@ -697,17 +757,15 @@ export const newsService = {
   // Parliament Live Detection
   async checkParliamentLive(): Promise<LiveStatus> {
     const apiKey = process.env.GEMINI_API_KEY || import.meta.env.GEMINI_API_KEY || import.meta.env.VITE_GEMINI_API_KEY;
-    if (!apiKey) {
-      console.warn("Gemini API key is missing, skipping live check.");
+    if (!apiKey || apiKey === "TODO_KEYHERE") {
       return { isLive: false };
     }
     try {
       const ai = new GoogleGenAI({ apiKey });
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
-        contents: "Is the Bangladesh Parliament (Jatiya Sangsad) currently in session and broadcasting live? If yes, provide the live stream URL (usually YouTube). Return JSON: { isLive: boolean, liveUrl?: string, title?: string }",
+        contents: "Is the Bangladesh Parliament (Jatiya Sangsad) currently in session and broadcasting live? Answer based on your knowledge. If yes, provide the live stream URL (usually YouTube). Return JSON: { isLive: boolean, liveUrl?: string, title?: string }",
         config: {
-          tools: [{ googleSearch: {} }],
           responseMimeType: "application/json"
         }
       });
@@ -721,12 +779,7 @@ export const newsService = {
         title: result.title || "National Parliament is broadcasting live"
       };
     } catch (error: any) {
-      const errorString = String(error);
-      if (errorString.includes("429") || errorString.includes("RESOURCE_EXHAUSTED") || errorString.includes("quota")) {
-        // Silently fail on quota exhaustion to prevent console spam
-        return { isLive: false };
-      }
-      console.error("Error checking parliament live status:", error);
+      // Silently catch all Gemini errors
       return { isLive: false };
     }
   }

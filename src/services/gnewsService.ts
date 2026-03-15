@@ -44,7 +44,7 @@ export const gnewsService = {
     let description = article.description;
     let keywords: string[] = [];
 
-    if (apiKey) {
+    if (apiKey && apiKey !== "TODO_KEYHERE") {
       try {
         const ai = new GoogleGenAI({ apiKey });
         const response = await ai.models.generateContent({
@@ -68,7 +68,7 @@ export const gnewsService = {
         description = result.description || description;
         keywords = result.keywords || [];
       } catch (e) {
-        console.error("Translation/Keyword generation failed, using original:", e);
+        // Silently fail translation
       }
     }
 

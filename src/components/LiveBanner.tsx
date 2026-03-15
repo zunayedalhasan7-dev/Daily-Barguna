@@ -20,8 +20,8 @@ export default function LiveBanner() {
     };
 
     checkLive();
-    // Check every 5 minutes
-    const interval = setInterval(checkLive, 5 * 60 * 1000);
+    // Check every 30 minutes
+    const interval = setInterval(checkLive, 30 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);
 
